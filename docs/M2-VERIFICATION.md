@@ -39,8 +39,19 @@ percentage. Domain's branch gate remains vacuous.
 
 ## CI
 
-Ubuntu and Windows matrix verification will be recorded on the pull request once
-both remote jobs finish. The workflow also uploads test/coverage reports and JARs.
+[CI run 38151716716](https://github.com/dutoitc/kodvido/actions/runs/38151716716)
+passes on commit `e0fb75f44bc34b67f456f6f306e7b46ad9b27695` in
+[PR #2](https://github.com/dutoitc/kodvido/pull/2):
+
+| OS | Discovered | Passed | Skipped | Result |
+|---|---:|---:|---:|---|
+| Ubuntu | 37 | 36 | 1 Windows-only junction test | SUCCESS |
+| Windows | 37 | 35 | 2 POSIX-only permission tests | SUCCESS |
+
+The symlink tests ran on both systems. All configured JaCoCo gates passed on both
+systems, and test/coverage reports plus runnable JARs were uploaded. Percentages
+above are local measurements; CI confirms the gates, not identical percentages.
+The pull request records verification of the final documentation commit.
 
 ## Limits and next slices
 
