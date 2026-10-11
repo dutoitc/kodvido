@@ -40,7 +40,7 @@ class CatalogIntegrationTest {
         mvc.perform(post("/scan").param("roots", temp.toString())).andExpect(status().isForbidden());
         mvc.perform(post("/import").param("previewId", UUID.randomUUID().toString())).andExpect(status().isForbidden());
         mvc.perform(get("/").with(r -> { r.setServerName("evil.example"); return r; })).andExpect(status().isForbidden());
-        mvc.perform(get("/api/system")).andExpect(status().isOk()).andExpect(jsonPath("$.stage").value("M1"));
+        mvc.perform(get("/api/system")).andExpect(status().isOk()).andExpect(jsonPath("$.stage").value("M2.1"));
     }
     @Test void errorsAndUnselectedImportsDoNotWrite() throws Exception {
         mvc.perform(post("/scan").with(csrf()).param("roots", "relative")).andExpect(status().isBadRequest());
@@ -54,5 +54,28 @@ class CatalogIntegrationTest {
         Path project = Files.createDirectory(temp.resolve("a&b")); Files.writeString(project.resolve("pom.xml"), "<project/>");
         mvc.perform(post("/scan").with(csrf()).param("roots", temp.toString())).andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString("a&amp;b")));
+    }
+    @Test void projectInspectionAndLiveDocumentsAreReadOnlyEscapedAndCsrfProtected() throws Exception {
+        Files.writeString(temp.resolve("pom.xml"), "<project/>");
+        Path doc = temp.resolve("AGENTS.md"); Files.writeString(doc, "<script>bad()</script>");
+        var preview = service.preview(List.of(temp.toString())); service.confirm(preview.id(), List.of(0));
+        String url = "/projects/" + service.list().getFirst().id();
+        mvc.perform(get(url)).andExpect(status().isOk()).andExpect(view().name("project"));
+        mvc.perform(post(url + "/inspect")).andExpect(status().isForbidden());
+        mvc.perform(post(url + "/inspect").with(csrf())).andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("filesystem-activity-1")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("TODO.md")));
+        mvc.perform(get(url + "/documents/AGENTS.md")).andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("&lt;script&gt;bad()&lt;/script&gt;")));
+        Files.writeString(doc, "updated source");
+        mvc.perform(get(url + "/documents/AGENTS.md")).andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("updated source")));
+        mvc.perform(get(url + "/documents/secret.txt")).andExpect(status().isBadRequest());
+        Files.delete(doc);
+        mvc.perform(get(url + "/documents/AGENTS.md")).andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("MISSING")));
+        service.remove(service.list().getFirst().id());
+        mvc.perform(get(url)).andExpect(status().isBadRequest());
+        assertThat(Files.readString(temp.resolve("pom.xml"))).isEqualTo("<project/>");
     }
 }

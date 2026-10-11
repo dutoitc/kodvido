@@ -2,7 +2,8 @@
 
 A local Java 21 application for discovering and cataloguing software projects.
 The first M1 slice is implemented and verified by GitHub CI on Ubuntu and Windows;
-see [verification](docs/VERIFICATION.md). No M2/M3 features are implemented. No open-source licence is selected yet; see LICENSE-CHOICE.md.
+see [verification](docs/VERIFICATION.md). The first M2 slice adds a read-only project
+cockpit; M2 is still in progress and M3 has not started. No open-source licence is selected yet; see LICENSE-CHOICE.md.
 
 ## Build and run
 
@@ -32,7 +33,10 @@ No telemetry, remote calls, Git operations, or discovered scripts are run.
    POM are unchecked by default; select a child explicitly to manage it separately.
 4. Use **Relocaliser** after moving a project yourself. Validate the destination;
    Kodvido changes only the catalogue mapping and preserves the project UUID.
-5. Use **Retirer du catalogue** to remove an entry. Source files are never deleted.
+5. Open a project name, then **Observer les fichiers** to inspect file activity
+   and find project-owned documents. Open a document to read its live, escaped
+   UTF-8 text (256 KiB maximum); no content is copied into H2.
+6. Use **Retirer du catalogue** to remove an entry. Source files are never deleted.
 
 Scans never import automatically. Review expires after 30 minutes or a newer scan.
 Existing paths are not imported twice. Multi-project import is transactional.
@@ -70,3 +74,20 @@ JaCoCo enforces engine/domain ≥90% branches, detection ≥85% lines and persis
 
 See [requirements](docs/REQUIREMENTS.md), [decisions](docs/DECISIONS.md),
 [roadmap](docs/ROADMAP.md) and [verification](docs/VERIFICATION.md).
+
+## M2.1 project cockpit
+
+File activity uses filesystem modification times, with inclusive UTC 7/30-day
+windows and a low-confidence warning. Future timestamps produce partial evidence
+and do not count as recent activity. An incomplete scan never proves inactivity.
+Observations are transient and explicitly requested via a CSRF-protected form;
+opening the project page alone does not recursively scan it.
+
+Exclusions and bounded traversal are shown in the UI. `.gitignore` is not parsed.
+The four supported documents are `PROJECT.md`, `TODO.md`, `AGENTS.md`, `README.md`;
+arbitrary document paths, binary/non-UTF-8 contents, symlinks and oversized files
+are not supported. Missing documents are optional, not project failures.
+
+Git activity, interaction history, phases, restart cards, backup evidence,
+recommendations and portable JSON catalogue backup remain subsequent M2 work.
+See [M2 verification](docs/M2-VERIFICATION.md).

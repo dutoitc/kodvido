@@ -27,6 +27,9 @@
 ## Future (no implementation yet)
 GitLab/Bitbucket/Jenkins/OpenShift integrations, actual script execution behind confirmation, CLI/MCP, auto-version remediation, database/architecture annexes, change of profiles, richer recommendation policy.
 
-M1 automated acceptance passes on both operating systems; PR #1 is ready for review.
-M2/M3 remain unstarted.
+M1 automated acceptance passes on both operating systems; PR #1 was merged.
+M2.1 implements a project detail page, bounded file-mtime observations and live
+read-only links to four project-owned documents. The broader M2 items above remain
+unchecked until their full acceptance criteria pass. M3 remains unstarted.
+See `M2-VERIFICATION.md` for this increment.
 See `VERIFICATION.md` for the exact executed tests and current limitations.

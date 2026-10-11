@@ -52,3 +52,22 @@ The M1 implementation passes both GitHub matrix jobs after correcting Windows
 Reporting remains intentionally empty; no M2/M3 implementation is included.
 Mockito subclass mock maker avoids runtime self-attachment in restricted JVMs;
 web integration tests use the real application, JDBC repository and Flyway schema.
+
+## ADR-010 M2.1 read-only project cockpit — accepted
+
+Deliver the first M2 vertical slice before Git/phases/backup features. Activity
+counts filesystem mtimes only, not developer activity. Use inclusive UTC 7/30-day
+windows; future timestamps and incomplete traversal produce PARTIAL evidence.
+Counts exclude generated/vendor directories and expose their limits in the UI.
+Git, backup and last-interaction evidence stay explicitly UNKNOWN.
+
+Inspect on an explicit CSRF-protected POST to avoid recursive work on page open.
+Snapshots are transient in this increment; no history or schema migration is
+introduced yet. Keep observation logic in detection, coordination in engine and
+presentation in app. Document links resolve the current catalogue path on every
+request, so relocation does not retain stale paths or copied contents.
+
+Only four exact root-level Markdown filenames are allowed. Read bounded UTF-8
+text with no-follow checks, and HTML-escape it without Markdown rendering. Treat
+AGENTS.md and other contents as untrusted data, never instructions. The existing
+stable-tree / cooperative-timeout constraints also apply to these inspections.

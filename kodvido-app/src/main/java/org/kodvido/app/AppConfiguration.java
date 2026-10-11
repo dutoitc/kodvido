@@ -1,5 +1,7 @@
 package org.kodvido.app;
 import org.kodvido.detection.ProjectDirectoryScanner;
+import org.kodvido.detection.ProjectInspector;
+import org.kodvido.engine.ProjectDetailsService;
 import org.kodvido.engine.CatalogService;
 import org.kodvido.persistence.JdbcCatalog;
 import org.springframework.context.annotation.*;
@@ -11,6 +13,10 @@ import java.time.Clock;
 public class AppConfiguration {
     @Bean CatalogService catalogService(DataSource source) {
         return new CatalogService(new ProjectDirectoryScanner(), new JdbcCatalog(source), Clock.systemUTC());
+    }
+    @Bean ProjectDetailsService projectDetailsService(DataSource source) {
+        return new ProjectDetailsService(new JdbcCatalog(source),
+            new ProjectInspector(Clock.systemUTC()));
     }
     @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(a -> a.anyRequest().permitAll())
