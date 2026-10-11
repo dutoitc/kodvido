@@ -11,10 +11,11 @@ Local requests are protected by CSRF, a Host allowlist and escaped templates.
 Scans avoid links/junctions, exclude generated directories and report partial
 results. POM parsing disables external entities and never executes Maven/scripts.
 
-Validation: Java 21/Linux `mvn clean verify` passes with 26 executed tests and
-one Windows-only test skipped. Packaged-JAR HTTP smoke/restart test passes.
+Validation: Java 21/Linux `mvn clean verify` passes with 27 executed tests and
+one platform-specific test skipped on each of Ubuntu and Windows. Packaged-JAR HTTP smoke/restart test passes.
 JaCoCo thresholds pass; exact figures are in docs/VERIFICATION.md.
 
-**Draft / acceptance pending:** Ubuntu and Windows GitHub Actions have not run.
-Run both matrix jobs and inspect the native Windows junction test before merging.
-No M2/M3, public release or licence choice is included.
+**Ready for review:** Ubuntu and Windows GitHub Actions passed, including the
+native Windows junction test. Windows 8.3-path test assertions were corrected and
+equivalent-root deduplication is covered. Public visibility was authorized by the
+owner. No M2/M3 implementation or licence choice is included.

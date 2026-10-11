@@ -45,10 +45,10 @@ mounts are not recommended. Concurrent hostile filesystem replacement is outside
 the M1 threat model; no-follow checks reduce but cannot eliminate such OS races.
 
 ## ADR-009 Verification boundaries — accepted
-The supplied bootstrap compiles unchanged under Java 21 on Linux. GitHub repository
-creation is not exposed by the connected GitHub integration. Until a private repo
-is available, commits and CI configuration are local and Windows verification
-remains pending. M1 is not fully accepted until both GitHub matrix jobs pass.
+The supplied bootstrap compiles unchanged under Java 21 on Linux. The owner created
+the GitHub repository and explicitly approved public visibility on 2026-10-11.
+The M1 implementation passes both GitHub matrix jobs after correcting Windows
+8.3-path expectations in the tests. Licence selection remains a separate decision.
 Reporting remains intentionally empty; no M2/M3 implementation is included.
 Mockito subclass mock maker avoids runtime self-attachment in restricted JVMs;
 web integration tests use the real application, JDBC repository and Flyway schema.

@@ -1,9 +1,8 @@
 # Kodvido
 
 A local Java 21 application for discovering and cataloguing software projects.
-The first M1 slice is implemented and verified on Linux. Windows CI acceptance
-is still pending; see [verification](docs/VERIFICATION.md). No M2/M3 features are
-implemented. No open-source licence is selected yet; see LICENSE-CHOICE.md.
+The first M1 slice is implemented and verified by GitHub CI on Ubuntu and Windows;
+see [verification](docs/VERIFICATION.md). No M2/M3 features are implemented. No open-source licence is selected yet; see LICENSE-CHOICE.md.
 
 ## Build and run
 
@@ -14,8 +13,7 @@ mvn -B --no-transfer-progress clean verify
 java -jar kodvido-app/target/kodvido-app-0.1.0-SNAPSHOT.jar
 ```
 
-Open **http://127.0.0.1:8080**. The same commands work on Windows and Linux;
-Windows execution still needs confirmation by the supplied CI matrix.
+Open **http://127.0.0.1:8080**. These commands are verified on Windows and Linux.
 The app is local-only and must not be exposed through a reverse proxy or to a LAN.
 
 The executable JAR in the delivery archive only requires Java 21, not Maven.

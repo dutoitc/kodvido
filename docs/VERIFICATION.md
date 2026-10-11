@@ -7,11 +7,11 @@ Linux, Eclipse Temurin 21.0.12.1, Apache Maven 3.9.9.
 Environment-only Maven proxy/trust-store settings were required locally; none
 are included in source or delivery configuration.
 
-27 tests discovered; 26 executed successfully, 1 skipped, 0 failures, 0 errors.
+28 tests discovered; 27 executed successfully, 1 skipped, 0 failures, 0 errors.
 
 The sole skipped test is `windowsJunctionIsNotTraversed`, intentionally enabled
 only on Windows. The symlink and POSIX permission-denial tests ran on Linux.
-The Windows CI job must run the native junction test before acceptance.
+The native junction test also passes in the Windows CI job.
 
 | Module | Lines | Branches |
 |---|---:|---:|
@@ -47,17 +47,21 @@ Coverage above is per-module, not an invented repository-wide percentage.
 
 ## Delivery and acceptance limits
 
-No GitHub repository, remote commits, pull request or Actions run was created.
-The connected GitHub account was verified; its connector exposes repository
-content/PR operations but not repository creation. A browser fallback to the
-GitHub creation page timed out before any repository was created. The supplied Ubuntu/Windows
-workflow is configured, **not remotely verified**. M1 is not fully accepted until
-both jobs pass. M2/M3 remain untouched.
+The owner authorized public visibility for [dutoitc/kodvido](https://github.com/dutoitc/kodvido).
+Implementation is in [PR #1](https://github.com/dutoitc/kodvido/pull/1), not yet merged.
+[CI run 38145468894](https://github.com/dutoitc/kodvido/actions/runs/38145468894)
+verified commit `60c257296184c80a375d8abfc587302b9e8e3068` with Java 21:
 
-Windows native junction handling is implemented conservatively using Java's
-NOFOLLOW attributes and is tested by the Windows-only CI test. It is not claimed
-as verified on Windows yet. Optional symbolic-link tests can be skipped there
-if the runner lacks the privilege to create symbolic links.
+| Job | Result | Discovered | Passed | Skipped |
+|---|---|---:|---:|---:|
+| Ubuntu | SUCCESS | 28 | 27 | 1 (Windows junction only) |
+| Windows | SUCCESS | 28 | 27 | 1 (POSIX permissions only) |
+
+All JaCoCo gates passed on both platforms; JAR and verification artifacts were
+uploaded successfully. The coverage percentages above are measured locally;
+remote logs confirm the same configured gates passed, not identical percentages.
+The Windows junction and symbolic-link tests ran successfully. M2/M3 remain
+untouched. Automated M1 acceptance is complete; the PR remains subject to review.
 
 Roots and previews are transient. M1 persists project UUID/name/path/timestamps;
 Git metadata, notes, persisted evidence history, portable catalogue export and
@@ -67,7 +71,7 @@ not automatic proof that the new directory is the same project.
 
 The scan budget is cooperative, not a hard timeout for blocked OS calls. No
 protection against hostile simultaneous filesystem mutation is claimed.
-The project licence still needs selection before public release.
+The repository is public by explicit owner authorization; its licence is not yet selected.
 
 ## Main changed files
 
@@ -86,4 +90,4 @@ path intentionally returned by Kodvido. Expectations now use real no-follow path
 a regression verifies equivalent root spellings yield one catalogue entry.
 Scanner fixtures are canonicalized so path-based assertions inspect candidates
 on Windows as well. The native Windows junction test passed in the failing run.
-The corrected matrix is pending verification.
+The corrected matrix passed on both operating systems (run linked above).
