@@ -2,15 +2,15 @@
 
 ## M0 — Bootstrap
 - [ ] Compile all modules and run initial tests on Linux and Windows.
-- [ ] Fix errors in supplied starter if any, document actual commands and results.
-- [ ] CI workflows, JaCoCo baseline, .gitignore, documentation and safety defaults.
+- [x] Compile the supplied starter on Linux; no compilation correction needed. Commands/results documented.
+- [x] CI workflows, JaCoCo gates, .gitignore, documentation and safety defaults configured.
 
 ## M1 — Scan + catalogue (first Work mission)
-- [ ] User declares scan roots; scanner discovers Maven and Python candidates without mutating them.
-- [ ] Exclude generated dirs, avoid symlink loops, protect against exceptions; nested multi-module Maven grouped.
-- [ ] Candidate review/import endpoint + minimal UI; persist chosen projects to file-backed H2 with Flyway.
-- [ ] List projects, inspect path, relocate without losing stable ID, remove **catalog only**.
-- [ ] Tests for nested Maven, Python, invalid paths, permissions where portable, Windows/Linux separators, and non-destructive removal.
+- [x] User declares scan roots; scanner discovers Maven and Python candidates without mutating them.
+- [x] Exclude generated dirs, avoid symlink loops, protect against exceptions; nested multi-module Maven grouped.
+- [x] Candidate review/import endpoint + minimal UI; persist chosen projects to file-backed H2 with Flyway.
+- [x] List projects, inspect path, relocate without losing stable ID, remove **catalog only**.
+- [x] Tests for nested Maven, Python, invalid paths, permissions where portable, Windows/Linux separators, and non-destructive removal.
 - [ ] `mvn -B verify` green on both OS GitHub CI.
 
 ## M2 — Usable cockpit
@@ -26,3 +26,6 @@
 
 ## Future (no implementation yet)
 GitLab/Bitbucket/Jenkins/OpenShift integrations, actual script execution behind confirmation, CLI/MCP, auto-version remediation, database/architecture annexes, change of profiles, richer recommendation policy.
+
+M1 remains pending acceptance until GitHub CI passes on both operating systems.
+See `VERIFICATION.md` for the exact executed tests and current limitations.

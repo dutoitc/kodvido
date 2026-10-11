@@ -5,6 +5,6 @@ import java.util.Map;
 @RestController
 public class SystemController {
  @GetMapping("/api/system") public Map<String, String> system() {
-   return Map.of("name", "Kodvido", "stage", "bootstrap", "status", "initial scaffold");
+   return Map.of("name", "Kodvido", "stage", "M1", "status", "local catalogue");
  }
 }

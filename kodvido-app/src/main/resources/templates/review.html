@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kodvido · Valider le scan</title><link rel="stylesheet" href="/style.css"></head><body><main>
+<a href="/">← Catalogue</a><h1>Valider les projets</h1><p>Rien n’a été importé. Les modules Maven sont décochés par défaut ; cochez-les pour les gérer séparément. Cette sélection expire après 30 minutes ou au prochain scan.</p>
+<aside th:if="${!preview.report.diagnostics.empty}"><h2>Scan incomplet ou racine indisponible</h2><p th:each="diagnostic : ${preview.report.diagnostics}" th:text="${diagnostic}"></p></aside>
+<p th:if="${preview.report.candidates.empty}">Aucun projet reconnu.</p>
+<form th:action="@{/import}" method="post"><input type="hidden" name="previewId" th:value="${preview.id}">
+<article th:each="candidate, iter : ${preview.report.candidates}"><label><input type="checkbox" name="selected" th:value="${iter.index}" th:checked="${candidate.parentRoot == null}"><strong th:text="${candidate.root}"></strong></label>
+<p th:text="${candidate.evidence}"></p><p th:if="${candidate.parentRoot != null}">Module de <span th:text="${candidate.parentRoot}"></span></p>
+<small><span th:text="${candidate.outcome}"></span> · <span th:text="${candidate.detectorVersion}"></span> · <span th:text="${candidate.observedAt}"></span></small>
+<p th:each="note : ${candidate.diagnostics}" th:text="${note}"></p></article>
+<button th:if="${!preview.report.candidates.empty}">Importer la sélection</button> <a href="/">Annuler</a></form></main></body></html>
