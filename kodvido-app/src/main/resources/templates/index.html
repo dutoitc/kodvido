@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kodvido · Catalogue local</title><link rel="stylesheet" href="/style.css"></head>
+<body><main><header><span class="badge">LOCAL · M1</span><h1>Kodvido</h1><p>Vos projets, à portée de main.</p></header>
+<section><h2>Découvrir des projets</h2><p>Une racine par ligne, en chemin absolu Windows ou Linux. Le scan ne modifie aucun fichier.</p>
+<form th:action="@{/scan}" method="post"><label for="roots">Dossiers à parcourir</label><textarea id="roots" name="roots" rows="3" required placeholder="~/projects"></textarea><button>Scanner et examiner</button></form></section>
+<section><h2>Catalogue <span th:text="${projects.size()}"></span></h2><p th:if="${projects.empty}">Aucun projet importé. Commencez par un scan.</p>
+<article th:each="project : ${projects}"><h3 th:text="${project.name}"></h3><p class="path" th:text="${project.path}"></p><small th:text="${project.id}"></small>
+<details><summary>Relocaliser</summary><p>Le dossier doit déjà avoir été déplacé. Seul le chemin du catalogue est mis à jour ; vérifiez qu’il s’agit bien du même projet.</p><form th:action="@{/projects/{id}/relocate(id=${project.id})}" method="post"><label>Nouveau chemin absolu<input name="path" required></label><button>Valider le nouveau chemin</button></form></details>
+<details><summary>Retirer du catalogue</summary><p>Les fichiers du projet restent intacts.</p><form th:action="@{/projects/{id}/remove(id=${project.id})}" method="post"><button class="secondary">Confirmer le retrait</button></form></details></article></section>
+<footer>Données locales · Aucun script exécuté · Aucun envoi à un service distant</footer></main></body></html>

@@ -1,0 +1,58 @@
+package org.kodvido.app;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.io.TempDir;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+import org.kodvido.engine.CatalogService;
+import java.nio.file.*;
+import java.util.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+@SpringBootTest(properties="spring.datasource.url=jdbc:h2:mem:app;DB_CLOSE_DELAY=-1")
+@AutoConfigureMockMvc
+class CatalogIntegrationTest {
+    @Autowired MockMvc mvc;
+    @Autowired CatalogService service;
+    @TempDir Path temp;
+    @BeforeEach void clear() { service.list().forEach(p -> service.remove(p.id())); }
+    @Test void completeOnboardingRelocationAndNonDestructiveRemovalThroughHttp() throws Exception {
+        Files.writeString(temp.resolve("pyproject.toml"), "[project]");
+        mvc.perform(get("/")).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.containsString("Kodvido")));
+        var result = mvc.perform(post("/scan").with(csrf()).param("roots", temp.toString())).andExpect(status().isOk()).andExpect(view().name("review")).andReturn();
+        var preview = (CatalogService.Preview) result.getModelAndView().getModel().get("preview");
+        assertThat(service.list()).isEmpty();
+        mvc.perform(post("/import").with(csrf()).param("previewId", preview.id().toString()).param("selected", "0")).andExpect(status().is3xxRedirection());
+        var project = service.list().getFirst(); Path moved = temp.resolveSibling(temp.getFileName() + "-moved");
+        try {
+            Files.move(temp, moved);
+            mvc.perform(post("/projects/" + project.id() + "/relocate").with(csrf()).param("path", moved.toString())).andExpect(status().is3xxRedirection());
+            assertThat(service.list().getFirst().id()).isEqualTo(project.id());
+            mvc.perform(get("/")).andExpect(status().isOk());
+            mvc.perform(post("/projects/" + project.id() + "/remove").with(csrf())).andExpect(status().is3xxRedirection());
+            assertThat(service.list()).isEmpty(); assertThat(Files.readString(moved.resolve("pyproject.toml"))).isEqualTo("[project]");
+        } finally { if (Files.exists(moved)) Files.move(moved, temp); }
+    }
+    @Test void csrfAndDnsRebindingAreBlocked() throws Exception {
+        mvc.perform(post("/scan").param("roots", temp.toString())).andExpect(status().isForbidden());
+        mvc.perform(post("/import").param("previewId", UUID.randomUUID().toString())).andExpect(status().isForbidden());
+        mvc.perform(get("/").with(r -> { r.setServerName("evil.example"); return r; })).andExpect(status().isForbidden());
+        mvc.perform(get("/api/system")).andExpect(status().isOk()).andExpect(jsonPath("$.stage").value("M1"));
+    }
+    @Test void errorsAndUnselectedImportsDoNotWrite() throws Exception {
+        mvc.perform(post("/scan").with(csrf()).param("roots", "relative")).andExpect(status().isBadRequest());
+        Files.writeString(temp.resolve("pom.xml"), "<project/>");
+        var p = service.preview(List.of(temp.toString()));
+        mvc.perform(post("/import").with(csrf()).param("previewId", p.id().toString())).andExpect(status().isBadRequest());
+        assertThat(service.list()).isEmpty();
+    }
+    @Test void untrustedNamesAreHtmlEscaped() throws Exception {
+        // Ampersand is a legal filename character on both target operating systems.
+        Path project = Files.createDirectory(temp.resolve("a&b")); Files.writeString(project.resolve("pom.xml"), "<project/>");
+        mvc.perform(post("/scan").with(csrf()).param("roots", temp.toString())).andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("a&amp;b")));
+    }
+}

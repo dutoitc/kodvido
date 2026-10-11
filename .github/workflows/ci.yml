@@ -2,8 +2,12 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   verify:
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -16,4 +20,20 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - run: mvn -B --no-transfer-progress verify
+      - name: Build, integration tests and coverage gates
+        run: mvn -B --no-transfer-progress clean verify
+      - name: Test and coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-${{ matrix.os }}
+          path: |
+            **/target/surefire-reports/*.xml
+            **/target/site/jacoco/**
+          retention-days: 7
+      - name: Runnable application
+        uses: actions/upload-artifact@v4
+        with:
+          name: kodvido-${{ matrix.os }}
+          path: kodvido-app/target/kodvido-app-*.jar
+          retention-days: 7

@@ -1,13 +1,21 @@
 server:
   address: 127.0.0.1
   port: 8080
+  error:
+    include-message: never
+    include-stacktrace: never
 spring:
   application:
     name: kodvido
   datasource:
-    url: jdbc:h2:file:${user.home}/.kodvido/data/kodvido;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:file:${KODVIDO_DATA_DIR:${user.home}/.kodvido/data}/kodvido;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password: ''
   flyway:
     enabled: true
+
+logging:
+  level:
+    org.flywaydb: WARN
+    com.zaxxer.hikari: WARN
