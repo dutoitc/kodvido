@@ -77,3 +77,13 @@ The project licence still needs selection before public release.
 - App composition/security/controller, Thymeleaf templates, CSS and configuration.
 - Unit/integration tests in domain/detection/engine/persistence/app.
 - README, roadmap, ADRs, M0 and M1 verification reports, draft PR description.
+
+## CI portability correction
+
+The first remote Ubuntu job passed. Windows reached the engine tests and exposed
+two test expectations comparing an 8.3 temporary-directory alias to the canonical
+path intentionally returned by Kodvido. Expectations now use real no-follow paths;
+a regression verifies equivalent root spellings yield one catalogue entry.
+Scanner fixtures are canonicalized so path-based assertions inspect candidates
+on Windows as well. The native Windows junction test passed in the failing run.
+The corrected matrix is pending verification.

@@ -42,7 +42,7 @@ class CatalogServiceTest {
         clock.now = clock.now.plusSeconds(20); service.relocate(original.id(), destination.toString());
         var moved = service.list().getFirst(); assertThat(moved.id()).isEqualTo(original.id());
         assertThat(moved.name()).isEqualTo(original.name()); assertThat(moved.createdAt()).isEqualTo(original.createdAt());
-        assertThat(moved.updatedAt()).isEqualTo(clock.now); assertThat(moved.path()).isEqualTo(destination);
+        assertThat(moved.updatedAt()).isEqualTo(clock.now); assertThat(moved.path()).isEqualTo(destination.toRealPath(LinkOption.NOFOLLOW_LINKS));
         assertThatThrownBy(() -> service.relocate(UUID.randomUUID(), destination.toString())).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> service.relocate(original.id(), temp.resolve("missing").toString())).isInstanceOf(java.io.IOException.class);
     }
@@ -82,7 +82,18 @@ class CatalogServiceTest {
         Files.writeString(temp.resolve("pom.xml"), "<project><modules><module>child</module></modules></project>");
         Files.createDirectory(temp.resolve("child")); Files.writeString(temp.resolve("child/pom.xml"), "<project/>");
         var p = service.preview(List.of(temp.toString())); service.confirm(p.id(), List.of(1));
-        assertThat(service.list()).hasSize(1).allSatisfy(x -> assertThat(x.path()).isEqualTo(temp.resolve("child")));
+        Path expected = temp.resolve("child").toRealPath(LinkOption.NOFOLLOW_LINKS);
+        assertThat(service.list()).hasSize(1).allSatisfy(x -> assertThat(x.path()).isEqualTo(expected));
+    }
+    @Test void equivalentRootsUseOneCanonicalCatalogueLocation() throws Exception {
+        Files.writeString(temp.resolve("pom.xml"), "<project/>");
+        var p = service.preview(List.of(temp.toString(), temp.resolve(".").toString()));
+        assertThat(p.report().candidates()).hasSize(1);
+        service.confirm(p.id(), List.of(0));
+        assertThat(service.list().getFirst().path()).isEqualTo(temp.toRealPath(LinkOption.NOFOLLOW_LINKS));
+        var again = service.preview(List.of(temp.resolve(".").toString()));
+        service.confirm(again.id(), List.of(0));
+        assertThat(service.list()).hasSize(1);
     }
     @Test void legacyDiscoveryDelegatesReadOnly() throws Exception {
         preview(); assertThat(new DiscoveryService(new ProjectDirectoryScanner()).preview(temp)).hasSize(1);

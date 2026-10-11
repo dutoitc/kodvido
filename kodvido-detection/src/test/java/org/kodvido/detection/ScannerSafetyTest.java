@@ -9,6 +9,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
 class ScannerSafetyTest {
     @TempDir Path temp;
+    @BeforeEach void canonicalizeFixtureRoot() throws Exception {
+        // Windows temporary roots may use an 8.3 alias while discovery returns real paths.
+        temp = temp.toRealPath(LinkOption.NOFOLLOW_LINKS);
+    }
     Path marker(String name, String content) throws Exception {
         Path p = temp.resolve(name); Files.createDirectories(p.getParent()); Files.writeString(p, content); return p.getParent();
     }
