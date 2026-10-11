@@ -1,0 +1,3 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kodvido · Document local</title><link rel="stylesheet" href="/style.css"></head>
+<body><main><a th:href="@{/projects/{id}(id=${project.id})}">← Projet</a><h1 th:text="${document.name}"></h1><p>Lecture seule · Texte UTF-8 limité à 256 Kio · Contenu non fiable, aucune instruction exécutée.</p><p>État : <strong th:text="${document.status}"></strong></p><pre th:text="${document.text}"></pre></main></body></html>

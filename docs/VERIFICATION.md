@@ -48,7 +48,7 @@ Coverage above is per-module, not an invented repository-wide percentage.
 ## Delivery and acceptance limits
 
 The owner authorized public visibility for [dutoitc/kodvido](https://github.com/dutoitc/kodvido).
-Implementation is in [PR #1](https://github.com/dutoitc/kodvido/pull/1), not yet merged.
+Implementation is in [PR #1](https://github.com/dutoitc/kodvido/pull/1), merged on 2026-10-11.
 [CI run 38145468894](https://github.com/dutoitc/kodvido/actions/runs/38145468894)
 verified commit `60c257296184c80a375d8abfc587302b9e8e3068` with Java 21:
 
@@ -60,8 +60,8 @@ verified commit `60c257296184c80a375d8abfc587302b9e8e3068` with Java 21:
 All JaCoCo gates passed on both platforms; JAR and verification artifacts were
 uploaded successfully. The coverage percentages above are measured locally;
 remote logs confirm the same configured gates passed, not identical percentages.
-The Windows junction and symbolic-link tests ran successfully. M2/M3 remain
-untouched. Automated M1 acceptance is complete; the PR remains subject to review.
+The Windows junction and symbolic-link tests ran successfully. This report records M1 only. Automated M1 acceptance is complete and PR #1 is
+merged. Subsequent work is recorded in `M2-VERIFICATION.md`.
 
 Roots and previews are transient. M1 persists project UUID/name/path/timestamps;
 Git metadata, notes, persisted evidence history, portable catalogue export and

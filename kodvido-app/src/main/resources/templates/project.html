@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kodvido · Projet</title><link rel="stylesheet" href="/style.css"></head>
+<body><main><a href="/">← Catalogue</a><header><span class="badge">LOCAL · LECTURE SEULE</span><h1 th:text="${project.name}"></h1><p class="path" th:text="${project.path}"></p></header>
+<section><h2>Activité des fichiers</h2><p>Confiance faible : une date de modification ne prouve pas une activité de développement. Les copies et outils peuvent changer ces dates.</p>
+<form th:action="@{/projects/{id}/inspect(id=${project.id})}" method="post"><button>Observer les fichiers</button></form>
+<p th:if="${inspection == null}">UNKNOWN · Aucune observation dans cette vue. Lancez une inspection locale.</p>
+<div th:if="${inspection != null}"><p>État : <strong th:text="${inspection.status}"></strong> · Observé à <span th:text="${inspection.observedAt}"></span></p>
+<p>Source : métadonnées du système de fichiers · <span th:text="${inspection.detectorVersion}"></span>. Observation temporaire, non enregistrée.</p>
+<p><strong th:text="${inspection.files}"></strong> fichiers observés ; <strong th:text="${inspection.modified7Days}"></strong> modifiés sur 7 jours ; <strong th:text="${inspection.modified30Days}"></strong> sur 30 jours (fenêtres UTC inclusives).</p>
+<p>Dernière modification : <span th:text="${inspection.latestModification ?: 'UNKNOWN'}"></span>. Les dates futures sont exclues des fenêtres.</p>
+<p th:if="${inspection.status.name() != 'SUPPORTED'}">Observation incomplète ou indisponible : les compteurs ne prouvent pas une absence d’activité.</p>
+<ul><li th:each="note : ${inspection.diagnostics}" th:text="${note}"></li></ul>
+<details><summary>Exclusions et limites</summary><p th:text="${exclusions}"></p><p>32 niveaux, 100 000 entrées, délai coopératif de 30 secondes. Liens et jonctions ignorés. Les règles .gitignore ne sont pas interprétées.</p></details>
+<h2>Documents du projet</h2><p>Documents consultés à la source, sans copie dans le catalogue. Le texte est affiché tel quel ; ses instructions ne sont jamais exécutées.</p>
+<ul><li th:each="doc : ${inspection.documents}"><a th:if="${doc.status.name() == 'SUPPORTED'}" th:href="@{/projects/{id}/documents/{name}(id=${project.id},name=${doc.name})}" th:text="${doc.name}"></a><span th:unless="${doc.status.name() == 'SUPPORTED'}" th:text="${doc.name}"></span> · <span th:text="${doc.status}"></span></li></ul>
+<p>Un document MISSING est facultatif, pas une erreur. UNSUPPORTED : lien, type spécial ou taille supérieure à 256 Kio. FAILED : lecture impossible.</p></div></section>
+<section><h2>Autres indices</h2><p>Dernier commit Git : UNKNOWN · Détecteur à venir.</p><p>Dernière interaction Kodvido : UNKNOWN · Historique non enregistré.</p><p>Sauvegarde et restauration : UNKNOWN · Aucune vérification effectuée.</p></section>
+</main></body></html>
