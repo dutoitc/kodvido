@@ -1,0 +1,15 @@
+**/target/
+.idea/
+.vscode/
+*.iml
+*.log
+*.db
+*.mv.db
+*.trace.db
+*.h2.db
+**/runtime-data/
+**/output/
+**/.env
+!**/.env.example
+.DS_Store
+Thumbs.db

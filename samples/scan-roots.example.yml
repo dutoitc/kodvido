@@ -1,0 +1,5 @@
+# User-specific roots must be stored outside the public repository.
+# Examples only; not scanned automatically.
+roots:
+  - ~/git
+  - 'D:\donnees\git'
