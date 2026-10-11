@@ -7,4 +7,4 @@
 <article th:each="project : ${projects}"><h3><a th:href="@{/projects/{id}(id=${project.id})}" th:text="${project.name}"></a></h3><p class="path" th:text="${project.path}"></p><small th:text="${project.id}"></small>
 <details><summary>Relocaliser</summary><p>Le dossier doit déjà avoir été déplacé. Seul le chemin du catalogue est mis à jour ; vérifiez qu’il s’agit bien du même projet.</p><form th:action="@{/projects/{id}/relocate(id=${project.id})}" method="post"><label>Nouveau chemin absolu<input name="path" required></label><button>Valider le nouveau chemin</button></form></details>
 <details><summary>Retirer du catalogue</summary><p>Les fichiers du projet restent intacts.</p><form th:action="@{/projects/{id}/remove(id=${project.id})}" method="post"><button class="secondary">Confirmer le retrait</button></form></details></article></section>
-<footer>Données locales · Aucun script exécuté · Aucun envoi à un service distant</footer></main></body></html>
+<footer><a href="/LICENSE">GPL v3 · Sans garantie</a> · Données locales · Aucun script exécuté · Aucun envoi à un service distant</footer></main></body></html>

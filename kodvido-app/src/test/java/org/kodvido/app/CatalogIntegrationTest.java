@@ -40,7 +40,8 @@ class CatalogIntegrationTest {
         mvc.perform(post("/scan").param("roots", temp.toString())).andExpect(status().isForbidden());
         mvc.perform(post("/import").param("previewId", UUID.randomUUID().toString())).andExpect(status().isForbidden());
         mvc.perform(get("/").with(r -> { r.setServerName("evil.example"); return r; })).andExpect(status().isForbidden());
-        mvc.perform(get("/api/system")).andExpect(status().isOk()).andExpect(jsonPath("$.stage").value("M2.1"));
+        mvc.perform(get("/LICENSE")).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.containsString("GNU GENERAL PUBLIC LICENSE")));
+        mvc.perform(get("/api/system")).andExpect(status().isOk()).andExpect(jsonPath("$.stage").value("M2.2"));
     }
     @Test void errorsAndUnselectedImportsDoNotWrite() throws Exception {
         mvc.perform(post("/scan").with(csrf()).param("roots", "relative")).andExpect(status().isBadRequest());
@@ -63,6 +64,8 @@ class CatalogIntegrationTest {
         mvc.perform(get(url)).andExpect(status().isOk()).andExpect(view().name("project"));
         mvc.perform(post(url + "/inspect")).andExpect(status().isForbidden());
         mvc.perform(post(url + "/inspect").with(csrf())).andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("git-head-1")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("NO_LOCAL_GIT_DIRECTORY")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("filesystem-activity-1")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("TODO.md")));
         mvc.perform(get(url + "/documents/AGENTS.md")).andExpect(status().isOk())

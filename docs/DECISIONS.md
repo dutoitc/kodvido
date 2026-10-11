@@ -71,3 +71,22 @@ Only four exact root-level Markdown filenames are allowed. Read bounded UTF-8
 text with no-follow checks, and HTML-escape it without Markdown rendering. Treat
 AGENTS.md and other contents as untrusted data, never instructions. The existing
 stable-tree / cooperative-timeout constraints also apply to these inspections.
+
+## ADR-011 Git evidence and GPLv3 — accepted
+
+The owner selected GPL v3 on 2026-10-11 after discussing commercial forks and
+reciprocity. Use GPL-3.0-only; retain the standard license text without added
+commercial restrictions. Embed LICENSE in distributable JARs and link it in the UI.
+The official repository's governance does not grant control over independent forks.
+
+For M2.2 use the trusted installed Git executable with a fixed, read-only HEAD-log
+command. No shell or project executable is used. Reject indirect metadata/config
+before invocation, remove inherited Git environment settings, ignore user/system
+configuration and disable signature verification, notes, pager, optional locks
+and automatic maintenance. Support packed commits and detached HEAD without
+reimplementing Git object parsing. Unsupported layouts fail closed. No network,
+status refresh, worktree writes, author identity, messages or remote URLs.
+
+Expose commit and committer time as local Git-declared evidence, separate from file
+mtime and unknown backup/interaction history. A commit is not proof of a push.
+Failure does not prove absence: an unborn or damaged HEAD is explicitly unreadable.
