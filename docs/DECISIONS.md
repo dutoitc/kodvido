@@ -156,3 +156,30 @@ fixed relative manifest names/codes, not exceptions or absolute paths.
 This is the first bounded R10 implementation, not complete stack/dependency
 inference. Observations remain transient and excluded from metadata backups.
 M3 is unchanged. The stable-tree and cooperative-filesystem limits still apply.
+
+## ADR-015 Bounded local interaction history — accepted
+
+M2.6 completes the missing local-interaction evidence in R08 with a separate
+append-only event interface and Flyway V3 table (retained window: 100 events per
+project). Events contain only project ID, sequence, fixed kind and local-clock
+instant. No path, command, document text, user identity or detector output is copied.
+
+Record INSPECTION_REQUESTED after catalogue identity lookup and before inspection;
+this is a request, not a success or source-activity claim. Record WORKFLOW_SAVED
+and RELOCATED in the same JDBC transaction as their successful mutation. Failed
+or stale saves/relocations cannot create success events. If event persistence fails,
+the associated mutation rolls back. Read-only page/document GETs do not record
+interactions; CSRF rejection precedes recording. Import/restore and earlier actions
+are not reconstructed. Empty history is explicitly UNKNOWN.
+
+A parent-row lock serializes insertion/retention per project. Ordering uses the
+monotonic database sequence rather than wall-clock timestamps (which can regress).
+Keep the newest 100 recorded events, cascade metadata removal, and preserve the
+history across relocation. This is a local convenience history, not an audit log
+or a developer productivity measure. Project files remain untouched.
+
+Version 1 JSON backups keep their existing identities/notes contract; this bounded
+operational history is intentionally excluded, like transient observations. Restored
+catalogues therefore start with UNKNOWN interaction history. This exclusion is
+visible on the backup and project pages and documented, without a format change.
+Backup-confidence indicators (R11) and M3 remain separate work.

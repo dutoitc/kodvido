@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><title>Kodvido · Sauvegarde</title><link rel="stylesheet" href="/style.css"></head>
 <body><main><a href="/">Catalogue</a><h1>Sauvegarde du catalogue</h1>
-<p>Le JSON contient les chemins locaux et vos notes déclarées : conservez-le en lieu sûr, ne le publiez pas. Il ne contient ni fichiers de projets ni observations Git. Ce téléchargement ne prouve pas la sauvegarde des projets eux-mêmes.</p>
+<p>Le JSON contient les chemins locaux et vos notes déclarées : conservez-le en lieu sûr, ne le publiez pas. Il ne contient ni fichiers de projets ni observations Git, ni historique des interactions. Ce téléchargement ne prouve pas la sauvegarde des projets eux-mêmes.</p>
 <form th:action="@{/backup/export}" method="post"><button>Télécharger la sauvegarde JSON</button></form>
 <h2>Restaurer des métadonnées</h2><p>Maximum 8 Mio et 1000 projets. Un aperçu permet de corriger les chemins pour cet ordinateur. Les identifiants, dates et notes sont conservés. Tout conflit d’identifiant ou de chemin annule l’import entier ; aucune entrée existante n’est remplacée.</p>
 <form th:action="@{/backup/preview}" method="post" enctype="multipart/form-data"><label>Fichier JSON<input type="file" name="file" accept="application/json,.json" required></label><button>Examiner avant import</button></form>

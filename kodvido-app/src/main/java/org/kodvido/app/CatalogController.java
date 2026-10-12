@@ -18,7 +18,8 @@ public class CatalogController {
         this.service = service; this.details = details; this.workflow = workflow;
     }
     @GetMapping("/projects/{id}") public String project(@PathVariable("id") UUID id, Model model) {
-        model.addAttribute("project", details.project(id)); model.addAttribute("workflow", workflow.load(id)); return "project";
+        model.addAttribute("project", details.project(id)); model.addAttribute("workflow", workflow.load(id));
+        model.addAttribute("interactions", details.interactions(id)); return "project";
     }
     @PostMapping("/projects/{id}/inspect") public String inspect(@PathVariable("id") UUID id, Model model) {
         model.addAttribute("project", details.project(id));
@@ -26,6 +27,7 @@ public class CatalogController {
         model.addAttribute("inspection", details.inspect(id));
         model.addAttribute("git", details.git(id));
         model.addAttribute("stack", details.stack(id));
+        model.addAttribute("interactions", details.interactions(id));
         model.addAttribute("exclusions", ProjectInspector.EXCLUDED.stream().sorted().toList());
         return "project";
     }
