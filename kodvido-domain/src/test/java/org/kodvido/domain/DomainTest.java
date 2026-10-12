@@ -29,4 +29,19 @@ class DomainTest {
         assertThatThrownBy(() -> snapshot.documents().clear()).isInstanceOf(UnsupportedOperationException.class);
         assertThatThrownBy(() -> snapshot.diagnostics().clear()).isInstanceOf(UnsupportedOperationException.class);
     }
+    @Test void workflowPhasesAreImmutableDeclaredData() {
+        var phases = new ArrayList<>(List.of(new WorkflowNotes.Phase(java.time.LocalDate.of(2026,1,1),"milestone",WorkflowNotes.State.DONE)));
+        var notes = new WorkflowNotes(UUID.randomUUID(),1,phases,"build","run",java.time.Instant.EPOCH);
+        phases.clear();assertThat(notes.phases()).hasSize(1);
+        assertThatThrownBy(() -> notes.phases().clear()).isInstanceOf(UnsupportedOperationException.class);
+        assertThat(new WorkflowConflictException().getMessage()).doesNotContain("SQL");
+    }
+    @Test void jdbcDiagnosticsExposeOnlyValidatedStateAndNumericCode() {
+        assertThat(new CatalogException("HY000", 90020).getMessage()).contains("HY000/90020");
+        for (String state : Arrays.asList(null, "private/path/token")) {
+            var error = new CatalogException(state, 42);
+            assertThat(error.getMessage()).contains("UNKNOWN/42").doesNotContain("private/path/token");
+            assertThat(error.getCause()).isNull();
+        }
+    }
 }

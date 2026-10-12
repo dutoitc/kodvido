@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kodvido · Phases et reprise</title><link rel="stylesheet" href="/style.css"></head>
+<body><main><a th:href="@{/projects/{id}(id=${project.id})}">← Projet</a><h1>Phases et reprise</h1><p th:text="${project.name}"></p>
+<p>Informations déclarées par vous, conservées dans le catalogue local. Aucun fichier du projet n’est modifié. Ne saisissez pas de mots de passe ou de jetons.</p>
+<form th:action="@{/projects/{id}/workflow(id=${project.id})}" method="post"><input type="hidden" name="revision" th:value="${notes.revision}">
+<section><h2>Phases récentes</h2><p>Jusqu’à cinq étapes importantes, dans l’ordre de votre choix. Videz la date et la description pour retirer une ligne lors de l’enregistrement.</p>
+<fieldset th:each="phase, slot : ${slots}"><legend th:text="|Phase ${slot.count}|"></legend>
+<label>Date<input type="date" name="date" th:value="${phase.date}"></label>
+<label>Description<input name="description" maxlength="500" th:value="${phase.description}"></label>
+<label>État<select name="state"><option value="PLANNED" th:selected="${phase.state.name() == 'PLANNED'}">Prévue</option><option value="IN_PROGRESS" th:selected="${phase.state.name() == 'IN_PROGRESS'}">En cours</option><option value="DONE" th:selected="${phase.state.name() == 'DONE'}">Terminée</option></select></label></fieldset></section>
+<section><h2>Développement · Construire et tester</h2><label>Prérequis, commandes et points de contrôle<textarea name="development" rows="6" maxlength="4000" th:text="${notes.development}"></textarea></label></section>
+<section><h2>Exploitation · Démarrer, diagnostiquer et déployer</h2><label>Procédure de reprise et contrôles<textarea name="operations" rows="6" maxlength="4000" th:text="${notes.operations}"></textarea></label></section>
+<p>L’enregistrement remplace ces notes du catalogue. Les commandes restent du texte ; aucun script n’est lancé.</p><button>Enregistrer dans le catalogue</button>
+</form></main></body></html>

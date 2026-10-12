@@ -13,14 +13,16 @@ import java.util.*;
 public class CatalogController {
     private final CatalogService service;
     private final ProjectDetailsService details;
-    public CatalogController(CatalogService service, ProjectDetailsService details) {
-        this.service = service; this.details = details;
+    private final org.kodvido.engine.WorkflowService workflow;
+    public CatalogController(CatalogService service, ProjectDetailsService details, org.kodvido.engine.WorkflowService workflow) {
+        this.service = service; this.details = details; this.workflow = workflow;
     }
     @GetMapping("/projects/{id}") public String project(@PathVariable("id") UUID id, Model model) {
-        model.addAttribute("project", details.project(id)); return "project";
+        model.addAttribute("project", details.project(id)); model.addAttribute("workflow", workflow.load(id)); return "project";
     }
     @PostMapping("/projects/{id}/inspect") public String inspect(@PathVariable("id") UUID id, Model model) {
         model.addAttribute("project", details.project(id));
+        model.addAttribute("workflow", workflow.load(id));
         model.addAttribute("inspection", details.inspect(id));
         model.addAttribute("git", details.git(id));
         model.addAttribute("exclusions", ProjectInspector.EXCLUDED.stream().sorted().toList());

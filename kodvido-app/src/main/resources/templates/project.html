@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kodvido · Projet</title><link rel="stylesheet" href="/style.css"></head>
-<body><main><a href="/">← Catalogue</a><header><span class="badge">LOCAL · LECTURE SEULE</span><h1 th:text="${project.name}"></h1><p class="path" th:text="${project.path}"></p></header>
+<body><main><a href="/">← Catalogue</a><header><span class="badge">LOCAL · FICHE PROJET</span><h1 th:text="${project.name}"></h1><p class="path" th:text="${project.path}"></p></header>
+<section><h2>Phases et reprise</h2><p>Déclaré par vous · Stocké uniquement dans le catalogue, sans modification des fichiers du projet.</p>
+<a th:href="@{/projects/{id}/workflow(id=${project.id})}">Modifier les phases et fiches de reprise</a> · <a th:href="@{/projects/{id}/documents/PROJECT.md(id=${project.id})}">Consulter PROJECT.md à la source</a>
+<p th:if="${workflow.updatedAt == null}">Aucune saisie enregistrée.</p><p th:if="${workflow.updatedAt != null}">Dernière saisie enregistrée : <span th:text="${workflow.updatedAt}"></span> · Révision <span th:text="${workflow.revision}"></span></p>
+<ul><li th:each="phase : ${workflow.phases}"><time th:text="${phase.date}"></time> · <strong th:text="${phase.state}"></strong> · <span th:text="${phase.description}"></span></li></ul>
+<h3>Développement · Construire et tester</h3><pre th:text="${workflow.development.isEmpty() ? 'Non renseigné' : workflow.development}"></pre>
+<h3>Exploitation · Démarrer, diagnostiquer et déployer</h3><pre th:text="${workflow.operations.isEmpty() ? 'Non renseigné' : workflow.operations}"></pre>
+<p>Notes non vérifiées. Les commandes affichées ne sont jamais exécutées par Kodvido.</p></section>
 <section><h2>Activité des fichiers</h2><p>Confiance faible : une date de modification ne prouve pas une activité de développement. Les copies et outils peuvent changer ces dates.</p>
 <form th:action="@{/projects/{id}/inspect(id=${project.id})}" method="post"><button>Observer les fichiers</button></form>
 <p th:if="${inspection == null}">UNKNOWN · Aucune observation dans cette vue. Lancez une inspection locale.</p>

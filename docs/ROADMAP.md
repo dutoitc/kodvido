@@ -17,7 +17,7 @@
 - [ ] Git/file activity detectors and evidence confidence + exclusions.
 - [ ] Read `PROJECT.md`/`TODO.md`/`AGENTS.md` as links, phases, operational restart, backup evidence.
 - [ ] Detector gaps with sanitized local enhancement request, recommendation cards.
-- [ ] Document project workflow and recent phases without turning into a task tracker.
+- [x] Document project workflow and recent phases without turning into a task tracker (M2.3).
 
 ## M3 — Offline exports
 - [ ] Snapshot model, self-contained dashboard/project HTML and readable single-page A4 PDF.
@@ -29,12 +29,16 @@ GitLab/Bitbucket/Jenkins/OpenShift integrations, actual script execution behind 
 
 M1 automated acceptance passes on both operating systems; PR #1 was merged.
 M2.1 implements a project detail page, bounded file-mtime observations and live
-read-only links to four project-owned documents. The broader M2 items above remain
-unchecked until their full acceptance criteria pass. M3 remains unstarted.
+read-only links to four project-owned documents. The other broader M2 items remain unchecked until their full acceptance criteria pass. M3 remains unstarted.
 See `M2-VERIFICATION.md` for this increment.
 See `VERIFICATION.md` for the exact executed tests and current limitations.
 
 M2.2 adds local HEAD commit evidence (packed and detached HEAD included) and adopts
-GPL-3.0-only as explicitly selected by the owner. Interaction history, phases,
-restart cards, backup evidence, recommendations and JSON metadata backup/import
-remain M2 work. M3 remains unstarted. See `M2.2-VERIFICATION.md`.
+GPL-3.0-only as explicitly selected by the owner. M3 remains unstarted. See `M2.2-VERIFICATION.md`.
+
+M2.3 implements up to five manual phases and separate development/operations restart
+worksheets, persisted with Flyway V2 and optimistic revision checks. R12/R13 are
+implemented by manual catalogue notes; project-owned documentation remains untouched.
+Interaction history, richer stack/script evidence, backup evidence, recommendations,
+local issue drafts and portable JSON metadata backup/import remain before full M2
+acceptance. See `M2.3-VERIFICATION.md`. M3 remains unstarted.

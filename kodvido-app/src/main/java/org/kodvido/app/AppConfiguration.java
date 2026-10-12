@@ -18,6 +18,10 @@ public class AppConfiguration {
         return new ProjectDetailsService(new JdbcCatalog(source),
             new ProjectInspector(Clock.systemUTC()));
     }
+    @Bean org.kodvido.engine.WorkflowService workflowService(DataSource source) {
+        return new org.kodvido.engine.WorkflowService(new JdbcCatalog(source),
+            new org.kodvido.persistence.JdbcWorkflowStore(source), Clock.systemUTC());
+    }
     @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(a -> a.anyRequest().permitAll())
             .headers(h -> h.contentSecurityPolicy(c -> c.policyDirectives("default-src 'self'; style-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")))

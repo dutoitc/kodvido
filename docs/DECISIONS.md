@@ -90,3 +90,17 @@ status refresh, worktree writes, author identity, messages or remote URLs.
 Expose commit and committer time as local Git-declared evidence, separate from file
 mtime and unknown backup/interaction history. A commit is not proof of a push.
 Failure does not prove absence: an unborn or damaged HEAD is explicitly unreadable.
+
+## ADR-012 Manual workflow notes — accepted
+
+M2.3 stores up to five manually entered recent phases plus separate development
+and operations restart notes in the local catalogue. This supplements optional
+PROJECT.md; it does not parse, copy, overwrite or replace project-owned documents.
+The UI labels this data as user-declared, with a save timestamp, separately from
+measured evidence. Commands remain inert text; no execution control is added.
+
+Use a separate domain port and JDBC adapter, with Flyway V2, stable project foreign
+keys and cascading metadata removal. Relocation preserves notes. Save the entire
+small worksheet atomically and require its revision to match, preventing lost
+updates from two browser tabs. Initial revision is zero; successful saves advance
+it. No phase task tracker, automatic project-file editing or M3 exports.
