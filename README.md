@@ -72,7 +72,7 @@ Git/file observations and their history remain transient.
 including real H2/Flyway and a Spring web context. Reports are in each module's
 `target/site/jacoco/index.html`; Surefire XML is in `target/surefire-reports`.
 JaCoCo enforces engine/domain ≥90% branches, detection ≥85% lines and persistence
-≥80% lines. Domain currently contains no measured branches; reporting is empty.
+≥80% lines. Reporting is empty; domain and engine branch gates apply to measured branches.
 
 See [requirements](docs/REQUIREMENTS.md), [decisions](docs/DECISIONS.md),
 [roadmap](docs/ROADMAP.md) and [verification](docs/VERIFICATION.md).
