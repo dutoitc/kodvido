@@ -26,7 +26,7 @@ public final class JdbcWorkflowStore implements WorkflowStore {
                 } while (rows.next());
                 return Optional.of(new WorkflowNotes(id, revision, phases, dev, ops, updated));
             }
-        } catch (SQLException ex) { throw new CatalogException(); }
+        } catch (SQLException ex) { throw new CatalogException(ex.getSQLState(), ex.getErrorCode()); }
     }
     @Override public void save(WorkflowNotes notes) {
         try (var c = source.getConnection()) {
@@ -60,6 +60,6 @@ public final class JdbcWorkflowStore implements WorkflowStore {
                 }
                 c.commit();
             } catch (SQLException | RuntimeException ex) { c.rollback(); throw ex; }
-        } catch (SQLException ex) { throw new CatalogException(); }
+        } catch (SQLException ex) { throw new CatalogException(ex.getSQLState(), ex.getErrorCode()); }
     }
 }

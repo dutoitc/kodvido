@@ -36,4 +36,12 @@ class DomainTest {
         assertThatThrownBy(() -> notes.phases().clear()).isInstanceOf(UnsupportedOperationException.class);
         assertThat(new WorkflowConflictException().getMessage()).doesNotContain("SQL");
     }
+    @Test void jdbcDiagnosticsExposeOnlyValidatedStateAndNumericCode() {
+        assertThat(new CatalogException("HY000", 90020).getMessage()).contains("HY000/90020");
+        for (String state : Arrays.asList(null, "private/path/token")) {
+            var error = new CatalogException(state, 42);
+            assertThat(error.getMessage()).contains("UNKNOWN/42").doesNotContain("private/path/token");
+            assertThat(error.getCause()).isNull();
+        }
+    }
 }

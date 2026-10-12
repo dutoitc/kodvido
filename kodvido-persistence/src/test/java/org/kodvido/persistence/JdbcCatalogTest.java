@@ -45,4 +45,8 @@ class JdbcCatalogTest {
         assertThatThrownBy(() -> catalog.remove(UUID.randomUUID())).isInstanceOf(CatalogException.class);
         assertThatThrownBy(() -> catalog.relocate(project("absent"))).isInstanceOf(CatalogException.class);
     }
+    @Test void repeatedFileDatabaseReopensPreserveRows() {
+        var p = project("reopen"); catalog.addAll(List.of(p));
+        for (int i = 0; i < 30; i++) assertThat(new JdbcCatalog(source).list()).containsExactly(p);
+    }
 }
