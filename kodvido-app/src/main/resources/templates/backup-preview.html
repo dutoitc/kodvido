@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><title>Kodvido · Aperçu de restauration</title><link rel="stylesheet" href="/style.css"></head>
+<body><main><a href="/backup">Annuler / autre fichier</a><h1>Vérifier la restauration</h1>
+<p>Les chemins doivent être absolus et adaptés à cet ordinateur (Windows ou Linux). Leur existence et leur contenu ne sont pas vérifiés ici. Les dossiers manquants pourront être relocalisés ensuite ; aucun fichier ne sera créé ou modifié.</p>
+<p>Sauvegarde créée le <span th:text="${preview.backup.exportedAt}"></span>. Aperçu valable jusqu’au <span th:text="${preview.expiresAt}"></span>. Un nouvel aperçu remplace le précédent.</p>
+<form th:action="@{/backup/confirm}" method="post"><input type="hidden" name="token" th:value="${preview.id}">
+<article th:each="p : ${preview.backup.projects}"><h2 th:text="${p.name}"></h2><small th:text="${p.id}"></small>
+<label>Chemin local<input name="path" th:value="${p.path}" maxlength="4000" required></label>
+<details th:if="${p.notes != null}"><summary>Notes à restaurer</summary><p>Révision <span th:text="${p.notes.revision}"></span> · <span th:text="${p.notes.updatedAt}"></span></p>
+<ul><li th:each="phase : ${p.notes.phases}"><span th:text="${phase.date}"></span> · <span th:text="${phase.description}"></span> · <span th:text="${phase.state}"></span></li></ul>
+<h3>Développement</h3><pre th:text="${p.notes.development}"></pre><h3>Exploitation</h3><pre th:text="${p.notes.operations}"></pre></details></article>
+<button th:unless="${preview.backup.projects.empty}">Confirmer l’ajout de tous ces projets</button><p th:if="${preview.backup.projects.empty}">Cette sauvegarde est vide.</p></form></main></body></html>

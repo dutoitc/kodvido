@@ -19,6 +19,8 @@
 - [ ] Detector gaps with sanitized local enhancement request, recommendation cards.
 - [x] Document project workflow and recent phases without turning into a task tracker (M2.3).
 
+- [x] Portable JSON catalogue backup/import, with review and manual path mapping (M2.4).
+
 ## M3 — Offline exports
 - [ ] Snapshot model, self-contained dashboard/project HTML and readable single-page A4 PDF.
 - [ ] Automated checks for standalone HTML, injection sanitization and PDF exactly 1 page.
@@ -40,5 +42,9 @@ M2.3 implements up to five manual phases and separate development/operations res
 worksheets, persisted with Flyway V2 and optimistic revision checks. R12/R13 are
 implemented by manual catalogue notes; project-owned documentation remains untouched.
 Interaction history, richer stack/script evidence, backup evidence, recommendations,
-local issue drafts and portable JSON metadata backup/import remain before full M2
-acceptance. See `M2.3-VERIFICATION.md`. M3 remains unstarted.
+local issue drafts remain before full M2 acceptance. JSON metadata backup/import
+is implemented in M2.4. See `M2.3-VERIFICATION.md`. M3 remains unstarted.
+
+M2.4 implements R20 JSON metadata backup/import, including M2.3 notes. It does not
+establish project backup confidence (R11) or implement M3 reports. See
+`M2.4-VERIFICATION.md` for executed checks and limits.

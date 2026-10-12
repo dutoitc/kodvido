@@ -104,3 +104,28 @@ keys and cascading metadata removal. Relocation preserves notes. Save the entire
 small worksheet atomically and require its revision to match, preventing lost
 updates from two browser tabs. Initial revision is zero; successful saves advance
 it. No phase task tracker, automatic project-file editing or M3 exports.
+
+## ADR-013 Portable catalogue metadata backup — accepted
+
+M2.4 adds versioned local JSON backup/import (R20), separate from M3 shareable
+reports. The explicit CSRF-protected download includes stable IDs, names, paths,
+creation/update timestamps and all manual workflow notes/revisions. It excludes
+project files and transient detector evidence. Paths cannot be sanitized in a
+restore artifact without losing its purpose: the UI identifies this download as
+private local metadata, never a shareable report. It is neither encrypted nor
+proof of source/data backup; no remote destination is contacted.
+
+The persistence port reads a serializable transaction snapshot and inserts a
+restoration batch plus notes in one transaction. Existing IDs or identical stored
+path strings cause rollback; no merge/overwrite option is provided. JSON version
+1 is strict and bounded (8 MiB, 1000 entries, depth 32, normal field limits).
+Malformed input and SQL failures do not echo private content.
+
+A transient preview expires after 30 minutes and is replaced by the next valid
+preview. The user can edit each destination path before confirming. Paths must be
+native absolute paths on the destination OS; foreign paths are not guessed.
+Missing directories are permitted so catalogue recovery does not require restoring
+source files first. Paths are normalized lexically, not resolved or traversed;
+filesystem aliases, case variants and symlinks are not identified during import.
+No scan, folder creation, command execution or source-file restoration occurs.
+Regular inspection and relocation retain their existing no-follow controls.
