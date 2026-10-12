@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kodvido · Conflit de fiche</title><link rel="stylesheet" href="/style.css"></head>
+<body><main><h1>Fiche modifiée dans un autre onglet</h1><p th:text="${message}"></p><p>Votre saisie ci-dessous n’a pas été enregistrée. Copiez les éléments à conserver avant de recharger la fiche actuelle.</p>
+<ul><li th:each="description, slot : ${descriptions}"><span th:text="${dates[slot.index]}"></span> · <span th:text="${states[slot.index]}"></span> · <span th:text="${description}"></span></li></ul>
+<h2>Développement</h2><pre th:text="${development}"></pre><h2>Exploitation</h2><pre th:text="${operations}"></pre>
+<a th:href="${returnUrl}">Recharger la fiche actuelle</a></main></body></html>

@@ -40,7 +40,7 @@ class JdbcCatalogTest {
         catalog.remove(UUID.randomUUID());
     }
     @Test void databaseErrorsAreSanitized() throws Exception {
-        try (var c = source.getConnection(); var s = c.createStatement()) { s.execute("DROP TABLE project"); }
+        try (var c = source.getConnection(); var s = c.createStatement()) { s.execute("DROP TABLE project CASCADE"); }
         assertThatThrownBy(catalog::list).isInstanceOf(CatalogException.class).hasMessageNotContaining(temp.toString());
         assertThatThrownBy(() -> catalog.remove(UUID.randomUUID())).isInstanceOf(CatalogException.class);
         assertThatThrownBy(() -> catalog.relocate(project("absent"))).isInstanceOf(CatalogException.class);

@@ -42,7 +42,8 @@ can run one fixed, read-only command using the Git installed in the launch envir
 Scans never import automatically. Review expires after 30 minutes or a newer scan.
 Existing paths are not imported twice. Multi-project import is transactional.
 Root lists and detection previews are transient in M1; project identity/path/name
-and timestamps persist. Git/notes/observation history are future M2 work.
+and timestamps persist. Manual phases and restart notes also persist since M2.3;
+Git/file observations and their history remain transient.
 
 ## Safety and limitations
 
@@ -89,7 +90,7 @@ The four supported documents are `PROJECT.md`, `TODO.md`, `AGENTS.md`, `README.m
 arbitrary document paths, binary/non-UTF-8 contents, symlinks and oversized files
 are not supported. Missing documents are optional, not project failures.
 
-Interaction history, phases, restart cards, backup evidence,
+Interaction history and backup evidence,
 recommendations and portable JSON catalogue backup remain subsequent M2 work.
 See [M2 verification](docs/M2-VERIFICATION.md).
 
@@ -123,3 +124,22 @@ Metadata traversal is bounded at 32 levels / 100,000 entries / 5 seconds; the Gi
 process has a separate 5-second timeout and 4 KiB output cap. The stable-tree
 assumption still applies. Missing `.git` is MISSING; unreadable/corrupt/unborn HEAD
 is FAILED (not evidence of no repository). Observations remain transient.
+
+## M2.3 phases and restart worksheets
+
+Open a project and choose **Modifier les phases et fiches de reprise**. Record up
+to five important phases (date, description, planned/in-progress/done), plus separate
+**development** (build/test) and **operations** (run/diagnose/deploy) instructions.
+Descriptions are limited to 500 characters and each restart note to 4,000. Clear a
+phase's date and description to remove that row on save. Notes are inert text;
+Kodvido does not execute any entered command.
+
+These are user-declared catalogue notes, with a save timestamp and revision,
+separate from measured Git/file evidence and the project's own PROJECT.md. No
+project file is read into these notes or changed by saving. Do not enter secrets.
+Relocation preserves the worksheet; catalogue removal cascades only its metadata.
+
+Flyway V2 migrates existing V1 catalogues without replacing their projects. A save
+is transactional. A stale browser tab receives HTTP 409 and its unsaved text is
+shown for recovery; reload the current worksheet before submitting a new revision.
+There is no phase archive or full task tracker. See [M2.3 verification](docs/M2.3-VERIFICATION.md).
