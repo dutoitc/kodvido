@@ -180,3 +180,22 @@ safety are not inspected. No script or language/build runtime is invoked. Bounds
 256 KiB per manifest, XML depth 64, 200 directory entries and cooperative 5-second
 script enumeration. Links and special files are excluded. Empty evidence means
 UNKNOWN, not absence of a technology. Findings remain transient, outside backups.
+
+### M2.6 — Local interactions
+
+The project page now shows the last recorded Kodvido interaction and up to 100
+recent events: inspection requests, saved workflow notes and relocations. This
+history persists across restarts and relocation. Notes/path changes and their
+success events commit atomically; stale or failed mutations create no event.
+An inspection event records the request, including when inspection later finds
+missing files; it does not claim a successful inspection or developer activity.
+
+Read-only page/document views, scans before import and metadata imports/restores
+are not tracked. Older activity is not fabricated: an empty history is UNKNOWN.
+Ordering follows insertion sequence, so a corrected system clock does not reorder
+previous events. Retention/removal affects only catalogue metadata. No paths,
+commands, source content or identities are copied into these events.
+
+This bounded operational history is excluded from version 1 JSON backups; restoring
+metadata preserves notes but starts a fresh interaction history. It is not an audit
+log or evidence of project/data backup. Backup-confidence indicators remain pending.

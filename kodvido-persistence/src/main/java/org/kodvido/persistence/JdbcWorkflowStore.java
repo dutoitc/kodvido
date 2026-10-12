@@ -62,6 +62,7 @@ public final class JdbcWorkflowStore implements WorkflowStore {
                     }
                     s.executeBatch();
                 }
+                JdbcInteractionStore.append(c,notes.projectId(),Interaction.Kind.WORKFLOW_SAVED,notes.updatedAt());
                 c.commit();
             } catch (SQLException | RuntimeException ex) { c.rollback(); throw ex; }
         } catch (SQLException ex) { throw new CatalogException(ex.getSQLState(), ex.getErrorCode()); }

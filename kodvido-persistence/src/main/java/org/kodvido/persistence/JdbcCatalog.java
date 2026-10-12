@@ -35,10 +35,15 @@ public final class JdbcCatalog implements Catalog {
         } catch (SQLException ex) { throw new CatalogException(ex.getSQLState(), ex.getErrorCode()); }
     }
     @Override public void relocate(CatalogProject project) {
-        try (var connection = source.getConnection(); var statement = connection.prepareStatement("UPDATE project SET primary_path=?,updated_at=? WHERE id=?")) {
-            statement.setString(1, project.path().toString()); statement.setObject(2, project.updatedAt().atOffset(ZoneOffset.UTC));
-            statement.setObject(3, project.id());
-            if (statement.executeUpdate() != 1) throw new CatalogException();
+        try (var connection = source.getConnection()) {
+            connection.setAutoCommit(false);
+            try (var statement = connection.prepareStatement("UPDATE project SET primary_path=?,updated_at=? WHERE id=?")) {
+                statement.setString(1, project.path().toString()); statement.setObject(2, project.updatedAt().atOffset(ZoneOffset.UTC));
+                statement.setObject(3, project.id());
+                if (statement.executeUpdate() != 1) throw new CatalogException();
+                JdbcInteractionStore.append(connection,project.id(),Interaction.Kind.RELOCATED,project.updatedAt());
+                connection.commit();
+            } catch (SQLException | RuntimeException ex) { connection.rollback(); throw ex; }
         } catch (SQLException ex) { throw new CatalogException(ex.getSQLState(), ex.getErrorCode()); }
     }
     @Override public void remove(UUID id) {

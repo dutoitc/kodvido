@@ -16,7 +16,7 @@ public class AppConfiguration {
     }
     @Bean ProjectDetailsService projectDetailsService(DataSource source) {
         return new ProjectDetailsService(new JdbcCatalog(source),
-            new ProjectInspector(Clock.systemUTC()));
+            new ProjectInspector(Clock.systemUTC()), new org.kodvido.persistence.JdbcInteractionStore(source), Clock.systemUTC());
     }
     @Bean org.kodvido.engine.WorkflowService workflowService(DataSource source) {
         return new org.kodvido.engine.WorkflowService(new JdbcCatalog(source),

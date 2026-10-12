@@ -21,8 +21,15 @@ class ProjectDetailsServiceTest {
         };
         UUID id = UUID.randomUUID(); Instant now = Instant.now();
         catalog.addAll(List.of(new CatalogProject(id, "example", temp, now, now)));
-        var service = new ProjectDetailsService(catalog, new ProjectInspector(Clock.systemUTC()));
+        var events=new ArrayList<Interaction>();
+        var store=new InteractionStore() {
+            public List<Interaction> recent(UUID projectId) { return List.copyOf(events); }
+            public void record(UUID projectId,Interaction.Kind kind,Instant time) { events.add(new Interaction(events.size()+1,projectId,kind,time)); }
+        };
+        var service = new ProjectDetailsService(catalog, new ProjectInspector(Clock.systemUTC()),store,Clock.fixed(now,ZoneOffset.UTC));
+        assertThat(service.interactions(id)).isEmpty();
         assertThat(service.inspect(id).files()).isZero();
+        assertThat(service.interactions(id)).containsExactly(new Interaction(1,id,Interaction.Kind.INSPECTION_REQUESTED,now));
         assertThat(service.stack(id).status()).isEqualTo(ProjectInspection.Status.UNKNOWN);
         assertThat(service.git(id).status()).isEqualTo(ProjectInspection.Status.MISSING);
         Path moved = Files.createDirectory(temp.resolve("moved")); Files.writeString(moved.resolve("README.md"), "live");
@@ -31,9 +38,15 @@ class ProjectDetailsServiceTest {
         Files.writeString(moved.resolve(".python-version"),"3.12.1");
         assertThat(service.stack(id).evidence().getFirst().declaration()).isEqualTo("3.12.1");
         assertThatThrownBy(() -> service.project(UUID.randomUUID())).isInstanceOf(IllegalArgumentException.class);
+        assertThat(events).hasSize(1); // document/Git/stack reads do not create separate events.
+        catalog.relocate(new CatalogProject(id,"example",temp.resolve("missing"),now,now));
+        assertThat(service.inspect(id).status()).isEqualTo(ProjectInspection.Status.MISSING);
+        assertThat(events).hasSize(2); // request recorded even when the directory is missing.
         catalog.remove(id);
         assertThatThrownBy(() -> service.inspect(id)).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> service.stack(id)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.interactions(id)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(events).hasSize(2);
         assertThat(Files.readString(moved.resolve("README.md"))).isEqualTo("live");
     }
 }

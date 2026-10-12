@@ -53,3 +53,9 @@ M2.5 adds root Java/Maven and Python version declarations plus shallow script-na
 inventory (R10, partial coverage). Parent/profile/module resolution and broader
 Python packaging remain unsupported; no commands are executed. See
 `M2.5-VERIFICATION.md`. M3 remains unstarted.
+
+M2.6 adds the local interaction part of R08: persisted inspection requests,
+successful note saves and relocations, with a 100-event window per project. It is
+shown separately from Git/file activity; read-only page views are not events.
+See `M2.6-VERIFICATION.md`. R11 backup confidence, recommendations/local issue drafts,
+richer stack evidence and M3 remain pending.
