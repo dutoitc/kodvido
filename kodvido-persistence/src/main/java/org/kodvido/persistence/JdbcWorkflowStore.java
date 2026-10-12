@@ -11,9 +11,13 @@ public final class JdbcWorkflowStore implements WorkflowStore {
     private final DataSource source;
     public JdbcWorkflowStore(DataSource source) { this.source = source; }
     @Override public Optional<WorkflowNotes> find(UUID id) {
+        try (var c = source.getConnection()) { return find(c, id); }
+        catch (SQLException ex) { throw new CatalogException(ex.getSQLState(), ex.getErrorCode()); }
+    }
+    static Optional<WorkflowNotes> find(Connection c, UUID id) throws SQLException {
         String sql = "SELECT n.*, p.phase_order, p.phase_date, p.description, p.state FROM workflow_notes n "
             + "LEFT JOIN workflow_phase p ON p.project_id=n.project_id WHERE n.project_id=? ORDER BY p.phase_order";
-        try (var c = source.getConnection(); var s = c.prepareStatement(sql)) {
+        try (var s = c.prepareStatement(sql)) {
             s.setObject(1, id);
             try (var rows = s.executeQuery()) {
                 if (!rows.next()) return Optional.empty();
@@ -26,7 +30,7 @@ public final class JdbcWorkflowStore implements WorkflowStore {
                 } while (rows.next());
                 return Optional.of(new WorkflowNotes(id, revision, phases, dev, ops, updated));
             }
-        } catch (SQLException ex) { throw new CatalogException(ex.getSQLState(), ex.getErrorCode()); }
+        }
     }
     @Override public void save(WorkflowNotes notes) {
         try (var c = source.getConnection()) {

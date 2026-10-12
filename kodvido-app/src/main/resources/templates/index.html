@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kodvido · Catalogue local</title><link rel="stylesheet" href="/style.css"></head>
 <body><main><header><span class="badge">LOCAL · M2 EN COURS</span><h1>Kodvido</h1><p>Vos projets, à portée de main.</p></header>
+<p><a href="/backup">Sauvegarder ou restaurer le catalogue JSON</a></p>
 <section><h2>Découvrir des projets</h2><p>Une racine par ligne, en chemin absolu Windows ou Linux. Le scan ne modifie aucun fichier.</p>
 <form th:action="@{/scan}" method="post"><label for="roots">Dossiers à parcourir</label><textarea id="roots" name="roots" rows="3" required placeholder="~/projects"></textarea><button>Scanner et examiner</button></form></section>
 <section><h2>Catalogue <span th:text="${projects.size()}"></span></h2><p th:if="${projects.empty}">Aucun projet importé. Commencez par un scan.</p>

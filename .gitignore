@@ -17,3 +17,6 @@ Thumbs.db
 *.zip
 *.bundle
 .kodvido/
+
+# Local catalogue downloads contain private paths and notes
+kodvido-catalog*.json

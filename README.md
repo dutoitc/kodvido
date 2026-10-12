@@ -91,7 +91,7 @@ arbitrary document paths, binary/non-UTF-8 contents, symlinks and oversized file
 are not supported. Missing documents are optional, not project failures.
 
 Interaction history and backup evidence,
-recommendations and portable JSON catalogue backup remain subsequent M2 work.
+recommendations remain subsequent M2 work. Portable JSON catalogue backup is implemented in M2.4.
 See [M2 verification](docs/M2-VERIFICATION.md).
 
 ## License
@@ -143,3 +143,24 @@ Flyway V2 migrates existing V1 catalogues without replacing their projects. A sa
 is transactional. A stale browser tab receives HTTP 409 and its unsaved text is
 shown for recovery; reload the current worksheet before submitting a new revision.
 There is no phase archive or full task tracker. See [M2.3 verification](docs/M2.3-VERIFICATION.md).
+
+### M2.4 — Local JSON catalogue backup
+
+Open **Sauvegarder ou restaurer le catalogue JSON** from the home page. Download a
+version 1 JSON snapshot containing catalogue IDs, names, paths, timestamps, phases
+and development/operations notes. Treat this file as private: it contains local
+paths and manually entered text, is not encrypted, and must not be committed or
+shared publicly. Project files/documents and transient observations are excluded.
+
+To restore, upload the JSON, review the entries/notes, adapt absolute destination
+paths for Windows or Linux, then confirm. Missing directories are allowed; no
+filesystem access is performed. Identifiers, timestamps and note revisions are
+preserved. Any existing ID or identical stored path aborts the entire batch,
+without overwriting existing data. Restoring into an empty catalogue is the
+simplest complete recovery. A successful restore consumes the preview; previews
+expire after 30 minutes or when replaced. Limits: 8 MiB JSON, 1000 projects.
+Larger snapshots fail explicitly rather than silently dropping entries.
+
+This backs up catalogue metadata only, not project source, untracked files or
+application databases. It does not mark a project's backup as verified. M3 offline
+HTML/PDF reports remain unimplemented.
