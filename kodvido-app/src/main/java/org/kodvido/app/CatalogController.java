@@ -25,6 +25,7 @@ public class CatalogController {
         model.addAttribute("workflow", workflow.load(id));
         model.addAttribute("inspection", details.inspect(id));
         model.addAttribute("git", details.git(id));
+        model.addAttribute("stack", details.stack(id));
         model.addAttribute("exclusions", ProjectInspector.EXCLUDED.stream().sorted().toList());
         return "project";
     }

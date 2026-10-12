@@ -21,6 +21,15 @@
 <h2>Documents du projet</h2><p>Documents consultés à la source, sans copie dans le catalogue. Le texte est affiché tel quel ; ses instructions ne sont jamais exécutées.</p>
 <ul><li th:each="doc : ${inspection.documents}"><a th:if="${doc.status.name() == 'SUPPORTED'}" th:href="@{/projects/{id}/documents/{name}(id=${project.id},name=${doc.name})}" th:text="${doc.name}"></a><span th:unless="${doc.status.name() == 'SUPPORTED'}" th:text="${doc.name}"></span> · <span th:text="${doc.status}"></span></li></ul>
 <p>Un document MISSING est facultatif, pas une erreur. UNSUPPORTED : lien, type spécial ou taille supérieure à 256 Kio. FAILED : lecture impossible.</p></div></section>
+<section><h2>Versions déclarées et scripts</h2>
+<p th:if="${stack == null}">UNKNOWN · Lancez une observation.</p>
+<div th:if="${stack != null}"><p>État : <strong th:text="${stack.status}"></strong> · Observé à <span th:text="${stack.observedAt}"></span> · <span th:text="${stack.detectorVersion}"></span></p>
+<p>Indices déclaratifs, pas une version effective ou installée. Les valeurs contradictoires sont conservées côte à côte. Aucun runtime, Maven, Python ou script n’est lancé pour cette détection.</p>
+<table><thead><tr><th>Technologie</th><th>Source</th><th>Déclaration</th></tr></thead><tbody><tr th:each="e : ${stack.evidence}"><td th:text="${e.technology}"></td><td th:text="${e.source}"></td><td th:text="${e.declaration}"></td></tr></tbody></table>
+<p th:if="${stack.evidence.empty}">Version UNKNOWN · Aucune déclaration prise en charge trouvée.</p>
+<h3>Fichiers de scripts potentiels</h3><ul><li th:each="script : ${stack.scripts}"><code th:text="${script}"></code></li></ul>
+<p>Inventaire des noms uniquement : racine et dossier scripts, sans récursion, 200 entrées au total et délai coopératif de 5 secondes. Extensions .sh/.bat/.cmd/.ps1/.py et wrapper mvnw ; ni contenu, ni caractère exécutable, ni sécurité vérifiés.</p>
+<details><summary>Limites des déclarations</summary><p>Fichiers racine uniquement, 256 Kio maximum chacun. Maven : propriétés Java et configuration directe de maven-compiler-plugin ; parents, profils, modules, pluginManagement et expressions non résolus. Python : lecture lexicale du requires-python simple dans [project], et version simple dans .python-version ; TOML multiligne, Poetry, setup.py et imports non interprétés. Les résultats sont partiels et temporaires.</p><ul><li th:each="note : ${stack.diagnostics}" th:text="${note}"></li></ul></details></div></section>
 <section><h2>Autres indices</h2><h3>Dernier commit de HEAD</h3><p th:if="${git == null}">UNKNOWN · Lancez une observation.</p>
 <div th:if="${git != null}"><p>État : <strong th:text="${git.status}"></strong> · <span th:text="${git.diagnostic}"></span></p>
 <p>Commit : <code th:text="${git.commitId ?: 'UNKNOWN'}"></code></p><p>Date du commit (committer) : <span th:text="${git.committedAt ?: 'UNKNOWN'}"></span></p>

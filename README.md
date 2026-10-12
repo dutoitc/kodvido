@@ -164,3 +164,19 @@ Larger snapshots fail explicitly rather than silently dropping entries.
 This backs up catalogue metadata only, not project source, untracked files or
 application databases. It does not mark a project's backup as verified. M3 offline
 HTML/PDF reports remain unimplemented.
+
+### M2.5 — Stack declarations and potential scripts
+
+Use **Observer les fichiers** on a project page to see Java declarations from root
+Maven properties/compiler plugin, Python's simple `[project].requires-python` and
+`.python-version`, with source and observation time. Expressions and conflicting
+values are displayed as written, not resolved. These are partial declarations,
+not the installed or effective runtime. Parent POMs, profiles, child module POMs,
+pluginManagement, Poetry and dynamic Python configuration are not evaluated.
+
+Potential script names (`.sh`, `.bat`, `.cmd`, `.ps1`, `.py`, `mvnw`) are listed only
+at root and directly inside `scripts/`. Their content, executable permission and
+safety are not inspected. No script or language/build runtime is invoked. Bounds:
+256 KiB per manifest, XML depth 64, 200 directory entries and cooperative 5-second
+script enumeration. Links and special files are excluded. Empty evidence means
+UNKNOWN, not absence of a technology. Findings remain transient, outside backups.

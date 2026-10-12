@@ -129,3 +129,30 @@ source files first. Paths are normalized lexically, not resolved or traversed;
 filesystem aliases, case variants and symlinks are not identified during import.
 No scan, folder creation, command execution or source-file restoration occurs.
 Regular inspection and relocation retain their existing no-follow controls.
+
+## ADR-014 Root stack declarations and script filenames — accepted
+
+M2.5 adds transient evidence for R10 on explicit inspection. Read at most 256 KiB
+per root pom.xml, pyproject.toml and .python-version, with no-follow checks. Secure
+JDK XML parsing rejects DTD/entities and limits nesting to 64. Only direct Maven
+Java properties and build/plugins compiler configuration are collected; no parent,
+profile, child-module, pluginManagement or property interpolation resolution.
+Conflicting values remain separate, with their source. No effective runtime claim.
+
+Python support is intentionally lexical: one simple quoted requires-python in a
+single [project] table, and one simple version in .python-version. Multiline TOML,
+escaped constraints, duplicate declarations and invalid UTF-8 fail closed. This is
+not validation of the whole TOML document or interpretation of Poetry/setup.py.
+Do not add a partial home-grown packaging resolver or execute Maven/Python.
+
+Discover potential scripts by filename only at root and in the immediate scripts/
+directory (200 total entries, cooperative 5-second enumeration deadline). Never
+read or execute their content. Ignore links and special files. Results are PARTIAL
+when evidence exists, UNKNOWN if no supported evidence exists; missing/unreadable
+roots have explicit statuses. A linked scripts/ directory makes the observation
+FAILED while retaining any root declarations already read. Diagnostics contain
+fixed relative manifest names/codes, not exceptions or absolute paths.
+
+This is the first bounded R10 implementation, not complete stack/dependency
+inference. Observations remain transient and excluded from metadata backups.
+M3 is unchanged. The stable-tree and cooperative-filesystem limits still apply.
