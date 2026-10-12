@@ -23,6 +23,7 @@ class ProjectDetailsServiceTest {
         catalog.addAll(List.of(new CatalogProject(id, "example", temp, now, now)));
         var service = new ProjectDetailsService(catalog, new ProjectInspector(Clock.systemUTC()));
         assertThat(service.inspect(id).files()).isZero();
+        assertThat(service.git(id).status()).isEqualTo(ProjectInspection.Status.MISSING);
         Path moved = Files.createDirectory(temp.resolve("moved")); Files.writeString(moved.resolve("README.md"), "live");
         catalog.relocate(new CatalogProject(id, "example", moved, now, now));
         assertThat(service.document(id, "README.md").text()).isEqualTo("live");

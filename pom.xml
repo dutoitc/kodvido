@@ -4,6 +4,7 @@
   <artifactId>kodvido-parent</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <licenses><license><name>GNU General Public License, version 3 only</name><url>https://www.gnu.org/licenses/gpl-3.0.html</url><distribution>repo</distribution></license></licenses>
   <modules>
     <module>kodvido-domain</module>
     <module>kodvido-detection</module>
@@ -40,6 +41,10 @@
     </dependencies>
   </dependencyManagement>
   <build>
+    <resources>
+      <resource><directory>src/main/resources</directory></resource>
+      <resource><directory>${maven.multiModuleProjectDirectory}</directory><includes><include>LICENSE</include></includes><targetPath>META-INF</targetPath></resource>
+    </resources>
     <pluginManagement>
       <plugins>
         <plugin>

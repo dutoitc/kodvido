@@ -15,6 +15,9 @@ public final class ProjectDetailsService {
         return catalog.list().stream().filter(p -> p.id().equals(id)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Projet absent du catalogue."));
     }
+    public GitObservation git(UUID id) {
+        return new org.kodvido.detection.GitInspector(java.time.Clock.systemUTC()).inspect(project(id).path());
+    }
     public ProjectInspection inspect(UUID id) { return inspector.inspect(project(id).path()); }
     public ProjectInspection.DocumentText document(UUID id, String name) {
         return inspector.readDocument(project(id).path(), name);

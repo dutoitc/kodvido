@@ -33,3 +33,8 @@ read-only links to four project-owned documents. The broader M2 items above rema
 unchecked until their full acceptance criteria pass. M3 remains unstarted.
 See `M2-VERIFICATION.md` for this increment.
 See `VERIFICATION.md` for the exact executed tests and current limitations.
+
+M2.2 adds local HEAD commit evidence (packed and detached HEAD included) and adopts
+GPL-3.0-only as explicitly selected by the owner. Interaction history, phases,
+restart cards, backup evidence, recommendations and JSON metadata backup/import
+remain M2 work. M3 remains unstarted. See `M2.2-VERIFICATION.md`.

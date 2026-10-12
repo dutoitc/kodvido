@@ -22,6 +22,7 @@ public class CatalogController {
     @PostMapping("/projects/{id}/inspect") public String inspect(@PathVariable("id") UUID id, Model model) {
         model.addAttribute("project", details.project(id));
         model.addAttribute("inspection", details.inspect(id));
+        model.addAttribute("git", details.git(id));
         model.addAttribute("exclusions", ProjectInspector.EXCLUDED.stream().sorted().toList());
         return "project";
     }

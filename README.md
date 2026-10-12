@@ -3,7 +3,7 @@
 A local Java 21 application for discovering and cataloguing software projects.
 The first M1 slice is implemented and verified by GitHub CI on Ubuntu and Windows;
 see [verification](docs/VERIFICATION.md). The first M2 slice adds a read-only project
-cockpit; M2 is still in progress and M3 has not started. No open-source licence is selected yet; see LICENSE-CHOICE.md.
+cockpit; M2 is still in progress and M3 has not started. Licensed under **GPL-3.0-only**; see [LICENSE](LICENSE) and [license decision](LICENSE-CHOICE.md).
 
 ## Build and run
 
@@ -21,7 +21,8 @@ The executable JAR in the delivery archive only requires Java 21, not Maven.
 The H2 database is created outside the repository, under `~/.kodvido/data`.
 Set `KODVIDO_DATA_DIR` to an **absolute directory** before starting to use a
 separate home/work catalogue. Stop the app before copying its database files.
-No telemetry, remote calls, Git operations, or discovered scripts are run.
+No telemetry, remote calls or discovered scripts are run. Explicit inspection
+can run one fixed, read-only command using the Git installed in the launch environment.
 
 ## Use
 
@@ -88,6 +89,37 @@ The four supported documents are `PROJECT.md`, `TODO.md`, `AGENTS.md`, `README.m
 arbitrary document paths, binary/non-UTF-8 contents, symlinks and oversized files
 are not supported. Missing documents are optional, not project failures.
 
-Git activity, interaction history, phases, restart cards, backup evidence,
+Interaction history, phases, restart cards, backup evidence,
 recommendations and portable JSON catalogue backup remain subsequent M2 work.
 See [M2 verification](docs/M2-VERIFICATION.md).
+
+## License
+
+Copyright (C) 2026 Kodvido contributors. Kodvido is free software: you can
+redistribute it and/or modify it under the GNU General Public License as published
+by the Free Software Foundation, version 3 only. Kodvido is distributed without
+any warranty, including merchantability or fitness for a particular purpose.
+See [LICENSE](LICENSE) for the complete terms. Dependencies retain their own
+licenses. Commercial redistribution is permitted under GPLv3; no royalty or
+upstream contribution is required.
+
+## M2.2 local Git evidence
+
+The inspection form also reads the latest commit at the project's own `.git/HEAD`,
+including packed repositories and detached HEAD. It reports the commit hash and
+committer date, not authors, messages or remote URLs. The timestamp is Git-declared
+metadata, not independently verified activity; future timestamps are PARTIAL.
+This does not measure uncommitted changes, all branches or remote synchronisation.
+
+Git must be installed in the application's trusted launch environment. Kodvido
+uses one fixed read-only `git log` command without a shell, no pager/signature
+verification/notes, no global/system Git configuration, and no inherited `GIT_*`
+settings. No network operation or project script runs. Repository metadata is
+checked for links/junctions before Git starts. Includes, alternates, external
+worktrees/submodules, shallow/partial clones and extensions are conservatively
+UNSUPPORTED. It never searches parent directories for a repository.
+
+Metadata traversal is bounded at 32 levels / 100,000 entries / 5 seconds; the Git
+process has a separate 5-second timeout and 4 KiB output cap. The stable-tree
+assumption still applies. Missing `.git` is MISSING; unreadable/corrupt/unborn HEAD
+is FAILED (not evidence of no repository). Observations remain transient.

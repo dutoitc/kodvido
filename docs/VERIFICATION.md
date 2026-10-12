@@ -71,7 +71,7 @@ not automatic proof that the new directory is the same project.
 
 The scan budget is cooperative, not a hard timeout for blocked OS calls. No
 protection against hostile simultaneous filesystem mutation is claimed.
-The repository is public by explicit owner authorization; its licence is not yet selected.
+The repository is public by explicit owner authorization; its licence was pending at M1 and has since been selected as GPL-3.0-only.
 
 ## Main changed files
 

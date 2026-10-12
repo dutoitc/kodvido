@@ -14,5 +14,10 @@
 <h2>Documents du projet</h2><p>Documents consultés à la source, sans copie dans le catalogue. Le texte est affiché tel quel ; ses instructions ne sont jamais exécutées.</p>
 <ul><li th:each="doc : ${inspection.documents}"><a th:if="${doc.status.name() == 'SUPPORTED'}" th:href="@{/projects/{id}/documents/{name}(id=${project.id},name=${doc.name})}" th:text="${doc.name}"></a><span th:unless="${doc.status.name() == 'SUPPORTED'}" th:text="${doc.name}"></span> · <span th:text="${doc.status}"></span></li></ul>
 <p>Un document MISSING est facultatif, pas une erreur. UNSUPPORTED : lien, type spécial ou taille supérieure à 256 Kio. FAILED : lecture impossible.</p></div></section>
-<section><h2>Autres indices</h2><p>Dernier commit Git : UNKNOWN · Détecteur à venir.</p><p>Dernière interaction Kodvido : UNKNOWN · Historique non enregistré.</p><p>Sauvegarde et restauration : UNKNOWN · Aucune vérification effectuée.</p></section>
+<section><h2>Autres indices</h2><h3>Dernier commit de HEAD</h3><p th:if="${git == null}">UNKNOWN · Lancez une observation.</p>
+<div th:if="${git != null}"><p>État : <strong th:text="${git.status}"></strong> · <span th:text="${git.diagnostic}"></span></p>
+<p>Commit : <code th:text="${git.commitId ?: 'UNKNOWN'}"></code></p><p>Date du commit (committer) : <span th:text="${git.committedAt ?: 'UNKNOWN'}"></span></p>
+<p>Observé à <span th:text="${git.observedAt}"></span> · Source : HEAD local · <span th:text="${git.detectorVersion}"></span></p></div>
+<p>Confiance limitée : la date est déclarée par Git, pas une preuve de travail récent. Aucun contrôle des autres branches, modifications non commitées, synchronisation distante ou sauvegarde.</p>
+<details><summary>Limites Git</summary><p>Git doit être installé dans l’environnement de lancement. Pas de remontée vers un dépôt parent. Worktrees externes, liens, clones partiels/superficiels, objets alternatifs et inclusions de configuration non pris en charge. FAILED signifie lecture impossible, y compris un dépôt sans premier commit ; pas absence de dépôt.</p></details><p>Dernière interaction Kodvido : UNKNOWN · Historique non enregistré.</p><p>Sauvegarde et restauration : UNKNOWN · Aucune vérification effectuée.</p></section>
 </main></body></html>
