@@ -48,3 +48,8 @@ is implemented in M2.4. See `M2.3-VERIFICATION.md`. M3 remains unstarted.
 M2.4 implements R20 JSON metadata backup/import, including M2.3 notes. It does not
 establish project backup confidence (R11) or implement M3 reports. See
 `M2.4-VERIFICATION.md` for executed checks and limits.
+
+M2.5 adds root Java/Maven and Python version declarations plus shallow script-name
+inventory (R10, partial coverage). Parent/profile/module resolution and broader
+Python packaging remain unsupported; no commands are executed. See
+`M2.5-VERIFICATION.md`. M3 remains unstarted.

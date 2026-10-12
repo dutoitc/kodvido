@@ -41,7 +41,7 @@ class CatalogIntegrationTest {
         mvc.perform(post("/import").param("previewId", UUID.randomUUID().toString())).andExpect(status().isForbidden());
         mvc.perform(get("/").with(r -> { r.setServerName("evil.example"); return r; })).andExpect(status().isForbidden());
         mvc.perform(get("/LICENSE")).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.containsString("GNU GENERAL PUBLIC LICENSE")));
-        mvc.perform(get("/api/system")).andExpect(status().isOk()).andExpect(jsonPath("$.stage").value("M2.4"));
+        mvc.perform(get("/api/system")).andExpect(status().isOk()).andExpect(jsonPath("$.stage").value("M2.5"));
     }
     @Test void errorsAndUnselectedImportsDoNotWrite() throws Exception {
         mvc.perform(post("/scan").with(csrf()).param("roots", "relative")).andExpect(status().isBadRequest());
@@ -81,4 +81,19 @@ class CatalogIntegrationTest {
         mvc.perform(get(url)).andExpect(status().isBadRequest());
         assertThat(Files.readString(temp.resolve("pom.xml"))).isEqualTo("<project/>");
     }
+    @Test void stackDeclarationsAreRenderedEscapedOnlyOnExplicitInspection() throws Exception {
+        String pom="<project><properties><java.version>&lt;script&gt;declared()&lt;/script&gt;</java.version></properties></project>";
+        Files.writeString(temp.resolve("pom.xml"),pom);
+        Files.writeString(temp.resolve("build&test.sh"),"never execute");
+        var preview=service.preview(List.of(temp.toString()));service.confirm(preview.id(),List.of(0));
+        String url="/projects/"+service.list().getFirst().id();
+        mvc.perform(get(url)).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("declared()"))));
+        mvc.perform(post(url+"/inspect").with(csrf())).andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("stack-declarations-1")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("&lt;script&gt;declared()&lt;/script&gt;")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("build&amp;test.sh")));
+        assertThat(Files.readString(temp.resolve("pom.xml"))).isEqualTo(pom);
+        assertThat(Files.readString(temp.resolve("build&test.sh"))).isEqualTo("never execute");
+    }
+
 }

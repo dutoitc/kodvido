@@ -23,13 +23,17 @@ class ProjectDetailsServiceTest {
         catalog.addAll(List.of(new CatalogProject(id, "example", temp, now, now)));
         var service = new ProjectDetailsService(catalog, new ProjectInspector(Clock.systemUTC()));
         assertThat(service.inspect(id).files()).isZero();
+        assertThat(service.stack(id).status()).isEqualTo(ProjectInspection.Status.UNKNOWN);
         assertThat(service.git(id).status()).isEqualTo(ProjectInspection.Status.MISSING);
         Path moved = Files.createDirectory(temp.resolve("moved")); Files.writeString(moved.resolve("README.md"), "live");
         catalog.relocate(new CatalogProject(id, "example", moved, now, now));
         assertThat(service.document(id, "README.md").text()).isEqualTo("live");
+        Files.writeString(moved.resolve(".python-version"),"3.12.1");
+        assertThat(service.stack(id).evidence().getFirst().declaration()).isEqualTo("3.12.1");
         assertThatThrownBy(() -> service.project(UUID.randomUUID())).isInstanceOf(IllegalArgumentException.class);
         catalog.remove(id);
         assertThatThrownBy(() -> service.inspect(id)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.stack(id)).isInstanceOf(IllegalArgumentException.class);
         assertThat(Files.readString(moved.resolve("README.md"))).isEqualTo("live");
     }
 }
