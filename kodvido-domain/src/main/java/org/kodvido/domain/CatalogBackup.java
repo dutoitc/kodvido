@@ -5,5 +5,9 @@ import java.util.*;
 /** Local metadata transfer, deliberately not a sanitized shareable report. */
 public record CatalogBackup(int version, Instant exportedAt, List<Entry> projects) {
     public CatalogBackup { projects = List.copyOf(projects); }
-    public record Entry(UUID id, String name, String path, Instant createdAt, Instant updatedAt, WorkflowNotes notes) {}
+    public record Entry(UUID id, String name, String path, Instant createdAt, Instant updatedAt, WorkflowNotes notes, BackupAssessment assessment) {
+        public Entry(UUID id,String name,String path,Instant createdAt,Instant updatedAt,WorkflowNotes notes) {
+            this(id,name,path,createdAt,updatedAt,notes,null);
+        }
+    }
 }

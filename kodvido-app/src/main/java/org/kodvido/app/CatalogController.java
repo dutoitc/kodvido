@@ -14,11 +14,13 @@ public class CatalogController {
     private final CatalogService service;
     private final ProjectDetailsService details;
     private final org.kodvido.engine.WorkflowService workflow;
-    public CatalogController(CatalogService service, ProjectDetailsService details, org.kodvido.engine.WorkflowService workflow) {
-        this.service = service; this.details = details; this.workflow = workflow;
+    private final org.kodvido.engine.BackupAssessmentService assessments;
+    public CatalogController(CatalogService service, ProjectDetailsService details, org.kodvido.engine.WorkflowService workflow, org.kodvido.engine.BackupAssessmentService assessments) {
+        this.service = service; this.details = details; this.workflow = workflow; this.assessments=assessments;
     }
     @GetMapping("/projects/{id}") public String project(@PathVariable("id") UUID id, Model model) {
         model.addAttribute("project", details.project(id)); model.addAttribute("workflow", workflow.load(id));
+        model.addAttribute("assessment", assessments.load(id));
         model.addAttribute("interactions", details.interactions(id)); return "project";
     }
     @PostMapping("/projects/{id}/inspect") public String inspect(@PathVariable("id") UUID id, Model model) {
@@ -27,6 +29,7 @@ public class CatalogController {
         model.addAttribute("inspection", details.inspect(id));
         model.addAttribute("git", details.git(id));
         model.addAttribute("stack", details.stack(id));
+        model.addAttribute("assessment", assessments.load(id));
         model.addAttribute("interactions", details.interactions(id));
         model.addAttribute("exclusions", ProjectInspector.EXCLUDED.stream().sorted().toList());
         return "project";

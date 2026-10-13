@@ -18,3 +18,10 @@ erDiagram
 ```
 
 Do not create a large ORM model before M1. Enforce UUID identifiers independent of filesystem location. Phases may reside in PROJECT.md instead of database when detected as project-owned documentation; resolve source-of-truth and precedence with ADR before implementation.
+
+## Implemented backup declarations (M2.7)
+
+V4 adds `backup_assessment` (project UUID, revision, save timestamp) and four
+`backup_evidence` rows (dimension, declared state, optional check date, description).
+Both cascade only catalogue metadata on removal; relocation preserves identity.
+This is separate from detector observations and contains no verified-safe status.

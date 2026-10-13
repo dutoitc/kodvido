@@ -14,7 +14,7 @@ public final class BackupService {
     public record Preview(UUID id, Instant expiresAt, CatalogBackup backup) {}
     public BackupService(BackupStore store, Clock clock) { this.store=store; this.clock=clock; }
     public CatalogBackup export() {
-        var backup = new CatalogBackup(1, clock.instant(), store.snapshot());
+        var backup = new CatalogBackup(2, clock.instant(), store.snapshot());
         validate(backup); return backup;
     }
     public synchronized Preview preview(CatalogBackup backup) {
@@ -37,13 +37,13 @@ public final class BackupService {
             path = path.normalize();
             require(unique.add(path), "Chemins dupliqués.");
             var e=entries.get(i);
-            restored.add(new CatalogBackup.Entry(e.id(),e.name(),path.toString(),e.createdAt(),e.updatedAt(),e.notes()));
+            restored.add(new CatalogBackup.Entry(e.id(),e.name(),path.toString(),e.createdAt(),e.updatedAt(),e.notes(),e.assessment()));
         }
         store.restore(List.copyOf(restored));
         pending=null;
     }
-    private static void validate(CatalogBackup backup) {
-        require(backup.version()==1, "Version de sauvegarde non prise en charge.");
+    private void validate(CatalogBackup backup) {
+        require(backup.version()==1 || backup.version()==2, "Version de sauvegarde non prise en charge.");
         Objects.requireNonNull(backup.exportedAt());
         require(backup.projects().size() <= MAX_PROJECTS, "Maximum 1000 projets.");
         var ids=new HashSet<UUID>();
@@ -51,6 +51,14 @@ public final class BackupService {
             Objects.requireNonNull(e.id()); Objects.requireNonNull(e.createdAt()); Objects.requireNonNull(e.updatedAt());
             require(ids.add(e.id()), "Identifiants dupliqués.");
             text(e.name(),250); text(e.path(),4000);
+            if(e.assessment()!=null) {
+                require(backup.version()==2,"Preuves absentes du format version 1.");
+                var a=e.assessment();
+                require(e.id().equals(a.projectId()),"Preuves liées à un autre projet.");
+                require(a.revision()>0 && a.revision()<Long.MAX_VALUE,"Révision invalide.");
+                Objects.requireNonNull(a.updatedAt());
+                BackupAssessmentService.validateItems(a.items(),LocalDate.now(clock));
+            }
             if(e.notes()!=null) {
                 var n=e.notes();
                 require(e.id().equals(n.projectId()), "Notes liées à un autre projet.");

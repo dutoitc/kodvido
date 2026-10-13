@@ -19,7 +19,7 @@ public final class JdbcBackupStore implements BackupStore {
                     UUID id=rows.getObject("id",UUID.class);
                     result.add(new CatalogBackup.Entry(id,rows.getString("name"),rows.getString("primary_path"),
                         rows.getObject("created_at",OffsetDateTime.class).toInstant(),rows.getObject("updated_at",OffsetDateTime.class).toInstant(),
-                        JdbcWorkflowStore.find(c,id).orElse(null)));
+                        JdbcWorkflowStore.find(c,id).orElse(null),JdbcBackupAssessmentStore.find(c,id).orElse(null)));
                 }
                 c.commit(); return List.copyOf(result);
             } catch(SQLException | RuntimeException ex) { c.rollback(); throw ex; }
@@ -35,6 +35,7 @@ public final class JdbcBackupStore implements BackupStore {
                         s.setObject(4,e.createdAt().atOffset(ZoneOffset.UTC));s.setObject(5,e.updatedAt().atOffset(ZoneOffset.UTC));s.executeUpdate();
                     }
                     if(e.notes()!=null) insertNotes(c,e.notes());
+                    if(e.assessment()!=null) JdbcBackupAssessmentStore.insert(c,e.assessment());
                 }
                 c.commit();
             } catch(SQLException | RuntimeException ex) { c.rollback(); throw ex; }

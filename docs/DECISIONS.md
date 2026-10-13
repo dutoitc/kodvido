@@ -183,3 +183,29 @@ operational history is intentionally excluded, like transient observations. Rest
 catalogues therefore start with UNKNOWN interaction history. This exclusion is
 visible on the backup and project pages and documented, without a format change.
 Backup-confidence indicators (R11) and M3 remain separate work.
+
+## ADR-016 Dated backup declarations and JSON v2 — accepted
+
+R11 needs four independent dimensions: remote Git synchronization, copies of
+untracked/ignored files, application data backup, and an actual restore test.
+M2.7 implements a manual evidence worksheet, not a backup or verification engine.
+Each dimension defaults to UNKNOWN. DECLARED_OK and DECLARED_FAILED require a
+non-future UTC check date and an inert description (maximum 1000 characters).
+UNKNOWN has no check date, but may carry an explanatory note. These states never
+become verified through saving, inspection, relocation or metadata import. Old
+dates remain visible; there is no expiry policy or aggregate safe/green score.
+No remote URL is fetched and no backup/restore command is executed.
+
+The engine validates complete, unique dimensions. Flyway V4 stores the worksheet
+and its four evidence rows, keyed by the stable project UUID. Parent-row locking
+and optimistic revisions prevent concurrent first-save and stale-tab overwrites.
+Replacement and removal are transactional; source files are never touched. The
+worksheet has a save timestamp but adds no new interaction-history event kind.
+
+JSON export moves to version 2 to preserve these user-authored declarations, dates
+and revisions in the same transaction as project identity and workflow notes.
+Import accepts v1 (without assessments) and v2, rejects v1 with assessments and
+validates evidence before preview. Imports do not manufacture verified results or
+interaction history. Older Kodvido versions reject v2; use an updated application
+when restoring it. Private paths/notes remain local and are never issue content.
+Automatic confidence verification and richer backup policies remain future work.

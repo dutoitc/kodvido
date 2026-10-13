@@ -63,9 +63,9 @@ class BackupIntegrationTest {
     }
     @Test void invalidJsonIsBoundedStrictAndDoesNotEchoPrivateInput() throws Exception {
         String valid=new String(export(),java.nio.charset.StandardCharsets.UTF_8);
-        for(String bad:List.of("null","{}","{secret-path",valid+" {}",valid.replace("\"version\" : 1","\"version\" : 2"),
-            valid.replace("\"version\" : 1","\"version\" : 1, \"version\" : 1"),
-            valid.replace("\"version\" : 1","\"unknown\" : \"secret-path\", \"version\" : 1"),
+        for(String bad:List.of("null","{}","{secret-path",valid+" {}",valid.replace("\"version\" : 2","\"version\" : 3"),
+            valid.replace("\"version\" : 2","\"version\" : 2, \"version\" : 2"),
+            valid.replace("\"version\" : 2","\"unknown\" : \"secret-path\", \"version\" : 2"),
             "[".repeat(40)+"]".repeat(40),"x".repeat(8*1024*1024+1))) {
             mvc.perform(multipart("/backup/preview").file(new MockMultipartFile("file",bad.getBytes(java.nio.charset.StandardCharsets.UTF_8))).with(csrf()))
                 .andExpect(status().isBadRequest()).andExpect(content().string(org.hamcrest.Matchers.not(containsString("secret-path"))));

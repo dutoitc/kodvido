@@ -49,7 +49,7 @@ class BackupServiceTest {
         assertThat(saved).isEmpty();
     }
     @Test void rejectsInvalidEnvelopeIdentityAndText() {
-        invalid(new CatalogBackup(2,now,List.of())); invalid(new CatalogBackup(1,null,List.of()));
+        invalid(new CatalogBackup(3,now,List.of())); invalid(new CatalogBackup(1,null,List.of()));
         invalid(new CatalogBackup(1,now,Collections.nCopies(1001,entry(null)))); invalid(backup(entry(null),entry(null)));
         invalid(backup(new CatalogBackup.Entry(null,"fixture","/x",now,now,null)));
         invalid(backup(new CatalogBackup.Entry(id,"fixture","/x",null,now,null)));
