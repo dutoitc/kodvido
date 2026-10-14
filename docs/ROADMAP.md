@@ -61,7 +61,6 @@ See `M2.6-VERIFICATION.md`. R11 backup confidence, recommendations/local issue d
 richer stack evidence and M3 remain pending.
 
 M2.7 implements R11 as four independent, dated manual evidence declarations with
-UNKNOWN defaults, Flyway V4 persistence, optimistic concurrency and JSON v2 transfer
-(v1 import compatible). It does not verify backups automatically. See
+UNKNOWN defaults, Flyway V4 persistence, optimistic concurrency and JSON metadata transfer. It does not verify backups automatically. See
 `M2.7-VERIFICATION.md`. Recommendations/local sanitized drafts and final M2
 acceptance remain; M3 has not started.

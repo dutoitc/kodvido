@@ -209,3 +209,12 @@ validates evidence before preview. Imports do not manufacture verified results o
 interaction history. Older Kodvido versions reject v2; use an updated application
 when restoring it. Private paths/notes remain local and are never issue content.
 Automatic confidence verification and richer backup policies remain future work.
+
+## ADR-017 One development-time JSON format — supersedes ADR-016 transfer versioning
+
+The owner confirms that Kodvido is not yet in use and requests no import/export
+versioning. Remove the version discriminator and legacy branches; maintain one
+current JSON shape only. Earlier experimental exports are not supported. Retain
+strict field/type/size validation, preview/path mapping, atomic restore and private
+metadata warnings. This does not change Flyway schema migrations or worksheet
+revision counters, which protect database evolution and concurrent edits.

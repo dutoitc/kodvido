@@ -147,7 +147,7 @@ There is no phase archive or full task tracker. See [M2.3 verification](docs/M2.
 ### M2.4 — Local JSON catalogue backup
 
 Open **Sauvegarder ou restaurer le catalogue JSON** from the home page. Download a
-version 2 JSON snapshot containing catalogue IDs, names, paths, timestamps, phases
+JSON snapshot containing catalogue IDs, names, paths, timestamps, phases
 development/operations notes and manual backup declarations. Treat this file as private: it contains local
 paths and manually entered text, is not encrypted, and must not be committed or
 shared publicly. Project files/documents and transient observations are excluded.
@@ -215,7 +215,7 @@ Nothing executes, contacts a remote, or modifies a project when this form is sav
 Stale tabs receive HTTP 409 with escaped text for recovery. Relocation keeps the
 worksheet; removal deletes only catalogue metadata. Saves do not add a history event.
 
-JSON v2 includes these declarations; v1 remains importable with UNKNOWN defaults.
-Older application versions cannot import v2. Restoring metadata preserves the
+The current JSON format includes these declarations. During development there is
+no format version or backward-compatibility contract; earlier exports must be recreated. Restoring metadata preserves the
 original check dates/revisions, and never verifies or restores project data.
 See [M2.7 verification](docs/M2.7-VERIFICATION.md).

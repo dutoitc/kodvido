@@ -49,18 +49,17 @@ class BackupAssessmentServiceTest {
         service.save(id,0,items(new Item(Dimension.GIT_REMOTE,State.UNKNOWN,null,"x".repeat(1000))));
         assertThat(service.load(id).items().getFirst().evidence()).hasSize(1000);
     }
-    @Test void versionTwoRoundtripAndVersionOneCompatibilityValidateImportedClaims(){
+    @Test void roundtripValidatesImportedClaims(){
         service.save(id,0,items(good()));var assessment=service.load(id);
         final List<CatalogBackup.Entry> restored=new ArrayList<>();
         var entry=new CatalogBackup.Entry(id,"fixture",Path.of("fixture").toAbsolutePath().toString(),now,now,null,assessment);
         var backup=new BackupService(new BackupStore(){public List<CatalogBackup.Entry> snapshot(){return List.of(entry);}public void restore(List<CatalogBackup.Entry> es){restored.addAll(es);}},Clock.fixed(now,ZoneOffset.UTC));
-        var exported=backup.export();assertThat(exported.version()).isEqualTo(2);
+        var exported=backup.export();
         var preview=backup.preview(exported);backup.confirm(preview.id(),List.of(entry.path()));assertThat(restored.getFirst().assessment()).isEqualTo(assessment);
-        assertThatThrownBy(()->backup.preview(new CatalogBackup(1,now,List.of(entry)))).isInstanceOf(IllegalArgumentException.class);
-        backup.preview(new CatalogBackup(1,now,List.of(new CatalogBackup.Entry(id,"legacy",entry.path(),now,now,null))));
+        backup.preview(new CatalogBackup(now,List.of(new CatalogBackup.Entry(id,"legacy",entry.path(),now,now,null))));
         var bad=List.of(new BackupAssessment(UUID.randomUUID(),1,assessment.items(),now),
             new BackupAssessment(id,0,assessment.items(),now),new BackupAssessment(id,Long.MAX_VALUE,assessment.items(),now),
             new BackupAssessment(id,1,assessment.items(),null),new BackupAssessment(id,1,List.of(),now));
-        for(var a:bad)assertThatThrownBy(()->backup.preview(new CatalogBackup(2,now,List.of(new CatalogBackup.Entry(id,"fixture",entry.path(),now,now,null,a))))).isInstanceOfAny(IllegalArgumentException.class,NullPointerException.class);
+        for(var a:bad)assertThatThrownBy(()->backup.preview(new CatalogBackup(now,List.of(new CatalogBackup.Entry(id,"fixture",entry.path(),now,now,null,a))))).isInstanceOfAny(IllegalArgumentException.class,NullPointerException.class);
     }
 }

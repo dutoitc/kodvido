@@ -14,7 +14,7 @@ public final class BackupService {
     public record Preview(UUID id, Instant expiresAt, CatalogBackup backup) {}
     public BackupService(BackupStore store, Clock clock) { this.store=store; this.clock=clock; }
     public CatalogBackup export() {
-        var backup = new CatalogBackup(2, clock.instant(), store.snapshot());
+        var backup = new CatalogBackup(clock.instant(), store.snapshot());
         validate(backup); return backup;
     }
     public synchronized Preview preview(CatalogBackup backup) {
@@ -43,7 +43,6 @@ public final class BackupService {
         pending=null;
     }
     private void validate(CatalogBackup backup) {
-        require(backup.version()==1 || backup.version()==2, "Version de sauvegarde non prise en charge.");
         Objects.requireNonNull(backup.exportedAt());
         require(backup.projects().size() <= MAX_PROJECTS, "Maximum 1000 projets.");
         var ids=new HashSet<UUID>();
@@ -52,7 +51,6 @@ public final class BackupService {
             require(ids.add(e.id()), "Identifiants dupliqués.");
             text(e.name(),250); text(e.path(),4000);
             if(e.assessment()!=null) {
-                require(backup.version()==2,"Preuves absentes du format version 1.");
                 var a=e.assessment();
                 require(e.id().equals(a.projectId()),"Preuves liées à un autre projet.");
                 require(a.revision()>0 && a.revision()<Long.MAX_VALUE,"Révision invalide.");

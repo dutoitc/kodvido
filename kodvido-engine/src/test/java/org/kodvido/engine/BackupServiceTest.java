@@ -22,7 +22,7 @@ class BackupServiceTest {
     });
     WorkflowNotes notes() { return new WorkflowNotes(id,7,List.of(new WorkflowNotes.Phase(LocalDate.of(2025,12,1),"done",WorkflowNotes.State.DONE)),"build","run",now); }
     CatalogBackup.Entry entry(WorkflowNotes n) { return new CatalogBackup.Entry(id,"fixture","C:\\old\\project",now,now,n); }
-    CatalogBackup backup(CatalogBackup.Entry... entries) { return new CatalogBackup(1,now,List.of(entries)); }
+    CatalogBackup backup(CatalogBackup.Entry... entries) { return new CatalogBackup(now,List.of(entries)); }
     String nativePath() { return Path.of("fixture").toAbsolutePath().toString(); }
     void invalid(CatalogBackup b) { assertThatThrownBy(()->service.preview(b)).isInstanceOfAny(IllegalArgumentException.class,NullPointerException.class); }
     @Test void previewRequiresConfirmationPreservesNotesAndAllowsMissingNativePaths() {
@@ -49,8 +49,8 @@ class BackupServiceTest {
         assertThat(saved).isEmpty();
     }
     @Test void rejectsInvalidEnvelopeIdentityAndText() {
-        invalid(new CatalogBackup(3,now,List.of())); invalid(new CatalogBackup(1,null,List.of()));
-        invalid(new CatalogBackup(1,now,Collections.nCopies(1001,entry(null)))); invalid(backup(entry(null),entry(null)));
+        invalid(new CatalogBackup(null,List.of()));
+        invalid(new CatalogBackup(now,Collections.nCopies(1001,entry(null)))); invalid(backup(entry(null),entry(null)));
         invalid(backup(new CatalogBackup.Entry(null,"fixture","/x",now,now,null)));
         invalid(backup(new CatalogBackup.Entry(id,"fixture","/x",null,now,null)));
         invalid(backup(new CatalogBackup.Entry(id,"fixture","/x",now,null,null)));

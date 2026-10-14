@@ -48,22 +48,21 @@ class BackupAssessmentIntegrationTest {
         }
         assertThat(service.load(id).revision()).isZero();
     }
-    @Test void jsonRoundtripKeepsDeclarationsAndSupportsLegacy()throws Exception{
+    @Test void jsonRoundtripKeepsDeclarationsAndAllowsAbsentAssessment()throws Exception{
         mvc.perform(form().with(csrf())).andExpect(status().is3xxRedirection());var original=service.load(id);
         String json=mvc.perform(post("/backup/export").with(csrf())).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThat(json).contains("\"version\" : 2","DECLARED_OK");catalog.remove(id);
+        assertThat(json).contains("DECLARED_OK").doesNotContain("\"version\"");catalog.remove(id);
         var result=mvc.perform(multipart("/backup/preview").file(new MockMultipartFile("file","catalog.json","application/json",json.getBytes(java.nio.charset.StandardCharsets.UTF_8))).with(csrf()))
             .andExpect(status().isOk()).andExpect(content().string(containsString("non vérifiées"))).andReturn();
         var preview=(BackupService.Preview)result.getModelAndView().getModel().get("preview");
         mvc.perform(post("/backup/confirm").with(csrf()).param("token",preview.id().toString()).param("path",temp.toString())).andExpect(status().is3xxRedirection());
         assertThat(service.load(id)).isEqualTo(original);
         var tree=new com.fasterxml.jackson.databind.ObjectMapper().readTree(json);
-        ((com.fasterxml.jackson.databind.node.ObjectNode)tree).put("version",1);
         ((com.fasterxml.jackson.databind.node.ObjectNode)tree.get("projects").get(0)).remove("assessment");
         catalog.remove(id);
-        var legacyResult=mvc.perform(multipart("/backup/preview").file(new MockMultipartFile("file","legacy.json","application/json",tree.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8))).with(csrf())).andExpect(status().isOk()).andReturn();
-        var legacyPreview=(BackupService.Preview)legacyResult.getModelAndView().getModel().get("preview");
-        mvc.perform(post("/backup/confirm").with(csrf()).param("token",legacyPreview.id().toString()).param("path",temp.toString())).andExpect(status().is3xxRedirection());
+        var withoutAssessmentResult=mvc.perform(multipart("/backup/preview").file(new MockMultipartFile("file","catalog.json","application/json",tree.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8))).with(csrf())).andExpect(status().isOk()).andReturn();
+        var withoutAssessmentPreview=(BackupService.Preview)withoutAssessmentResult.getModelAndView().getModel().get("preview");
+        mvc.perform(post("/backup/confirm").with(csrf()).param("token",withoutAssessmentPreview.id().toString()).param("path",temp.toString())).andExpect(status().is3xxRedirection());
         assertThat(service.load(id).revision()).isZero();assertThat(service.load(id).items()).allMatch(i->i.state()==State.UNKNOWN);
     }
 }
