@@ -44,4 +44,12 @@ class DomainTest {
             assertThat(error.getCause()).isNull();
         }
     }
+    @Test void guidanceIsAnImmutableSnapshot() {
+        var advice=new ArrayList<>(List.of(new ProjectGuidance.Advice(ProjectGuidance.Topic.GIT,ProjectGuidance.Reason.UNKNOWN)));
+        var gaps=new ArrayList<>(List.of(new ProjectGuidance.Gap(ProjectGuidance.Detector.GIT,ProjectInspection.Status.UNKNOWN)));
+        var guidance=new ProjectGuidance(advice,gaps);advice.clear();gaps.clear();
+        assertThat(guidance.advice()).hasSize(1);assertThat(guidance.gaps()).hasSize(1);
+        assertThatThrownBy(()->guidance.advice().clear()).isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(()->guidance.gaps().clear()).isInstanceOf(UnsupportedOperationException.class);
+    }
 }
