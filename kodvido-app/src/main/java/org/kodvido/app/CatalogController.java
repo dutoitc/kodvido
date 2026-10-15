@@ -15,13 +15,14 @@ public class CatalogController {
     private final ProjectDetailsService details;
     private final org.kodvido.engine.WorkflowService workflow;
     private final org.kodvido.engine.BackupAssessmentService assessments;
-    public CatalogController(CatalogService service, ProjectDetailsService details, org.kodvido.engine.WorkflowService workflow, org.kodvido.engine.BackupAssessmentService assessments) {
-        this.service = service; this.details = details; this.workflow = workflow; this.assessments=assessments;
+    private final org.kodvido.engine.GuidanceService guidance;
+    public CatalogController(CatalogService service, ProjectDetailsService details, org.kodvido.engine.WorkflowService workflow, org.kodvido.engine.BackupAssessmentService assessments, org.kodvido.engine.GuidanceService guidance) {
+        this.service = service; this.details = details; this.workflow = workflow; this.assessments=assessments;this.guidance=guidance;
     }
     @GetMapping("/projects/{id}") public String project(@PathVariable("id") UUID id, Model model) {
         model.addAttribute("project", details.project(id)); model.addAttribute("workflow", workflow.load(id));
         model.addAttribute("assessment", assessments.load(id));
-        model.addAttribute("interactions", details.interactions(id)); return "project";
+        model.addAttribute("interactions", details.interactions(id)); addGuidance(model); return "project";
     }
     @PostMapping("/projects/{id}/inspect") public String inspect(@PathVariable("id") UUID id, Model model) {
         model.addAttribute("project", details.project(id));
@@ -32,7 +33,16 @@ public class CatalogController {
         model.addAttribute("assessment", assessments.load(id));
         model.addAttribute("interactions", details.interactions(id));
         model.addAttribute("exclusions", ProjectInspector.EXCLUDED.stream().sorted().toList());
-        return "project";
+        addGuidance(model);return "project";
+    }
+    private void addGuidance(Model model) {
+        var values=model.asMap();
+        var result=guidance.evaluate((org.kodvido.domain.WorkflowNotes)values.get("workflow"),
+            (org.kodvido.domain.BackupAssessment)values.get("assessment"),
+            (org.kodvido.domain.ProjectInspection)values.get("inspection"),
+            (org.kodvido.domain.GitObservation)values.get("git"),(org.kodvido.domain.StackObservation)values.get("stack"));
+        model.addAttribute("recommendations",GuidanceView.cards(result));
+        model.addAttribute("gapDrafts",GuidanceView.drafts(result,guidance));
     }
     @GetMapping("/projects/{id}/documents/{name}") public String document(@PathVariable("id") UUID id,
             @PathVariable("name") String name, Model model) {

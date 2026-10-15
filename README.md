@@ -91,7 +91,7 @@ arbitrary document paths, binary/non-UTF-8 contents, symlinks and oversized file
 are not supported. Missing documents are optional, not project failures.
 
 Interaction history and manual backup evidence are implemented in M2.6/M2.7;
-recommendations remain subsequent M2 work. Portable JSON catalogue backup is implemented in M2.4.
+suggestions and local detector-gap drafts are implemented in M2.8. Portable JSON catalogue backup is implemented in M2.4.
 See [M2 verification](docs/M2-VERIFICATION.md).
 
 ## License
@@ -219,3 +219,21 @@ The current JSON format includes these declarations. During development there is
 no format version or backward-compatibility contract; earlier exports must be recreated. Restoring metadata preserves the
 original check dates/revisions, and never verifies or restores project data.
 See [M2.7 verification](docs/M2.7-VERIFICATION.md).
+
+### M2.8 — Suggestions and local detector-gap drafts
+
+The project page suggests completing empty restart worksheets, checking UNKNOWN or
+failed backup declarations, and reviewing detector limitations. Before inspection,
+the detector suggestions are NOT_OBSERVED. Opening the page performs no new scan;
+only **Observer les fichiers** refreshes the transient observations used here.
+There is no global score or automatic script/update/repair. No suggestion does not
+mean the project or its backups are verified safe.
+
+After inspection, PARTIAL/UNKNOWN/UNSUPPORTED/FAILED results show a local Markdown
+issue draft. MISSING does not automatically suggest a detector enhancement. Choose
+**Télécharger ce brouillon Markdown** to save it locally. The text includes only
+allowlisted detector/status values and fixed guidance for a synthetic reproduction;
+project names, paths, raw diagnostics, source text and manual notes are excluded.
+No issue is submitted, no remote is contacted and download does not re-inspect.
+Review any additions before manually sharing a draft. These transient drafts are
+excluded from catalogue backups. See [M2.8 verification](docs/M2.8-VERIFICATION.md).

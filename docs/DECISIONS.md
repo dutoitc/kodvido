@@ -218,3 +218,27 @@ current JSON shape only. Earlier experimental exports are not supported. Retain
 strict field/type/size validation, preview/path mapping, atomic restore and private
 metadata warnings. This does not change Flyway schema migrations or worksheet
 revision counters, which protect database evolution and concurrent edits.
+
+## ADR-018 Deterministic suggestions and allowlisted local issue drafts — accepted
+
+M2.8 implements R14/R18 without an execution framework, network client, AI service
+or new persistence. GuidanceService consumes existing typed observations and manual
+worksheets. It emits immutable topic/reason codes; web wording remains in the app.
+No observation yet is NOT_OBSERVED, not MISSING/FAILED. Missing restart instructions,
+UNKNOWN or DECLARED_FAILED backup dimensions and incomplete/unavailable detectors
+produce suggestions. DECLARED_OK does not produce a verified-safe conclusion.
+There is no score, inferred inactivity, arbitrary age threshold or automatic action.
+
+Only PARTIAL, UNKNOWN, UNSUPPORTED and FAILED detector outcomes create local gap
+candidates. MISSING sources are not automatically enhancement requests. Candidates
+are not proof of bugs. The Markdown generator accepts only detector/status enums:
+FILES/GIT/STACK and the four allowed outcomes. It has no parameter for project IDs,
+names, paths, diagnostics, declarations, documents, notes or timestamps. Privacy is
+achieved by excluding arbitrary data, not by attempting to redact it with regexes.
+The generic template asks the user to prepare a synthetic reproduction manually.
+
+The explicit inspection page displays each draft. A CSRF-protected POST downloads
+only that fixed template, without rescanning, recording an event or sending it to
+GitHub. Values submitted to this download are treated as reported enum values,
+not independently authenticated observations. Review any user additions before
+sharing. No project files are created and no draft/history enters catalogue JSON.

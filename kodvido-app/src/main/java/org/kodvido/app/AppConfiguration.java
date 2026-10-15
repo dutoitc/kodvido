@@ -29,6 +29,7 @@ public class AppConfiguration {
         return new org.kodvido.engine.BackupAssessmentService(new JdbcCatalog(source),
             new org.kodvido.persistence.JdbcBackupAssessmentStore(source),Clock.systemUTC());
     }
+    @Bean org.kodvido.engine.GuidanceService guidanceService() { return new org.kodvido.engine.GuidanceService(); }
     @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(a -> a.anyRequest().permitAll())
             .headers(h -> h.contentSecurityPolicy(c -> c.policyDirectives("default-src 'self'; style-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")))
