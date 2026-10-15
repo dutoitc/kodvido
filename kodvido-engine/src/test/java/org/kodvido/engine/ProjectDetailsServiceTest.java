@@ -26,7 +26,7 @@ class ProjectDetailsServiceTest {
             public List<Interaction> recent(UUID projectId) { return List.copyOf(events); }
             public void record(UUID projectId,Interaction.Kind kind,Instant time) { events.add(new Interaction(events.size()+1,projectId,kind,time)); }
         };
-        var service = new ProjectDetailsService(catalog, new ProjectInspector(Clock.systemUTC()),store,Clock.fixed(now,ZoneOffset.UTC));
+        var service = new ProjectDetailsService(catalog, new ProjectInspector(Clock.systemUTC()),store,Clock.fixed(now,ZoneOffset.UTC),new ObservationCache());
         assertThat(service.interactions(id)).isEmpty();
         assertThat(service.inspect(id).files()).isZero();
         assertThat(service.interactions(id)).containsExactly(new Interaction(1,id,Interaction.Kind.INSPECTION_REQUESTED,now));

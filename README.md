@@ -14,7 +14,7 @@ mvn -B --no-transfer-progress clean verify
 java -jar kodvido-app/target/kodvido-app-0.1.0-SNAPSHOT.jar
 ```
 
-Open **http://127.0.0.1:8080**. These commands are verified on Windows and Linux.
+Open **http://127.0.0.1:8930**. These commands are verified on Windows and Linux.
 The app is local-only and must not be exposed through a reverse proxy or to a LAN.
 
 The executable JAR in the delivery archive only requires Java 21, not Maven.
@@ -91,7 +91,7 @@ arbitrary document paths, binary/non-UTF-8 contents, symlinks and oversized file
 are not supported. Missing documents are optional, not project failures.
 
 Interaction history and manual backup evidence are implemented in M2.6/M2.7;
-recommendations remain subsequent M2 work. Portable JSON catalogue backup is implemented in M2.4.
+suggestions and local detector-gap drafts are implemented in M2.8. Portable JSON catalogue backup is implemented in M2.4.
 See [M2 verification](docs/M2-VERIFICATION.md).
 
 ## License
@@ -219,3 +219,38 @@ The current JSON format includes these declarations. During development there is
 no format version or backward-compatibility contract; earlier exports must be recreated. Restoring metadata preserves the
 original check dates/revisions, and never verifies or restores project data.
 See [M2.7 verification](docs/M2.7-VERIFICATION.md).
+
+### M2.8 — Suggestions and local detector-gap drafts
+
+The project page suggests completing empty restart worksheets, checking UNKNOWN or
+failed backup declarations, and reviewing detector limitations. Before inspection,
+the detector suggestions are NOT_OBSERVED. Opening the page performs no new scan;
+only **Observer les fichiers** refreshes the transient observations used here.
+There is no global score or automatic script/update/repair. No suggestion does not
+mean the project or its backups are verified safe.
+
+After inspection, PARTIAL/UNKNOWN/UNSUPPORTED/FAILED results show a local Markdown
+issue draft. MISSING does not automatically suggest a detector enhancement. Choose
+**Télécharger ce brouillon Markdown** to save it locally. The text includes only
+allowlisted detector/status values and fixed guidance for a synthetic reproduction;
+project names, paths, raw diagnostics, source text and manual notes are excluded.
+No issue is submitted, no remote is contacted and download does not re-inspect.
+Review any additions before manually sharing a draft. These transient drafts are
+excluded from catalogue backups. See [M2.8 verification](docs/M2.8-VERIFICATION.md).
+
+### M2.9 — Filterable catalogue table
+
+The default URL is **http://127.0.0.1:8930** (`--server.port=...` still overrides it).
+The catalogue shows project/path, observed Java/Python declarations and script count,
+file activity, local HEAD date, restart completeness, backup unknown/failure counts
+and last recorded interaction. Open **Observer** to refresh one project's evidence.
+
+Search names, paths or displayed versions; combine technology and observation/backup
+filters, sort by name or recent inspection/interaction, and navigate 25 rows/page.
+No scan occurs on page load, filtering or pagination. No Java/Python evidence means
+UNKNOWN, not absence of a language. Inspection results remain dated and partial.
+
+The last 1000 inspection summaries stay in memory until restart, and disappear on
+relocation/removal. Display is capped at four declarations, 160 characters per field;
+inspect the project for fuller evidence. JSON backups exclude these temporary
+summaries. Workflow and backup declarations remain persisted independently.

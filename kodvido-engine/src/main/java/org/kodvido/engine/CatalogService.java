@@ -14,8 +14,9 @@ public final class CatalogService {
     private final Catalog catalog;
     private final Clock clock;
     private Preview pending;
-    public CatalogService(ProjectDirectoryScanner scanner, Catalog catalog, Clock clock) {
-        this.scanner = scanner; this.catalog = catalog; this.clock = clock;
+    private final ObservationCache cache;
+    public CatalogService(ProjectDirectoryScanner scanner, Catalog catalog, Clock clock, ObservationCache cache) {
+        this.scanner = scanner; this.catalog = catalog; this.clock = clock; this.cache=cache;
     }
     public synchronized Preview preview(List<String> roots) {
         if (roots.isEmpty() || roots.size() > 20) throw new IllegalArgumentException("Indiquez entre 1 et 20 racines.");
@@ -51,8 +52,9 @@ public final class CatalogService {
             .orElseThrow(() -> new IllegalArgumentException("Projet absent du catalogue."));
         Path path = SafePaths.directory(parsePath(destination));
         catalog.relocate(new CatalogProject(id, current.name(), path, current.createdAt(), clock.instant()));
+        cache.forget(id);
     }
-    public void remove(UUID id) { catalog.remove(id); }
+    public void remove(UUID id) { catalog.remove(id); cache.forget(id); }
     static Path parsePath(String value) {
         String text = value.trim();
         if (text.isEmpty()) throw new IllegalArgumentException("Chemin vide.");
