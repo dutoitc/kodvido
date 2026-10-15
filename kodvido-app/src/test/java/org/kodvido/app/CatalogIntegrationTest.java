@@ -41,7 +41,7 @@ class CatalogIntegrationTest {
         mvc.perform(post("/import").param("previewId", UUID.randomUUID().toString())).andExpect(status().isForbidden());
         mvc.perform(get("/").with(r -> { r.setServerName("evil.example"); return r; })).andExpect(status().isForbidden());
         mvc.perform(get("/LICENSE")).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.containsString("GNU GENERAL PUBLIC LICENSE")));
-        mvc.perform(get("/api/system")).andExpect(status().isOk()).andExpect(jsonPath("$.stage").value("M2.6"));
+        mvc.perform(get("/api/system")).andExpect(status().isOk()).andExpect(jsonPath("$.stage").value("M2.7"));
     }
     @Test void errorsAndUnselectedImportsDoNotWrite() throws Exception {
         mvc.perform(post("/scan").with(csrf()).param("roots", "relative")).andExpect(status().isBadRequest());

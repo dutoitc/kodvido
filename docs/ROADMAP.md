@@ -59,3 +59,8 @@ successful note saves and relocations, with a 100-event window per project. It i
 shown separately from Git/file activity; read-only page views are not events.
 See `M2.6-VERIFICATION.md`. R11 backup confidence, recommendations/local issue drafts,
 richer stack evidence and M3 remain pending.
+
+M2.7 implements R11 as four independent, dated manual evidence declarations with
+UNKNOWN defaults, Flyway V4 persistence, optimistic concurrency and JSON metadata transfer. It does not verify backups automatically. See
+`M2.7-VERIFICATION.md`. Recommendations/local sanitized drafts and final M2
+acceptance remain; M3 has not started.
