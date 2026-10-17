@@ -16,7 +16,7 @@
 ## M2 — Usable cockpit
 - [ ] Git/file activity detectors and evidence confidence + exclusions.
 - [ ] Read `PROJECT.md`/`TODO.md`/`AGENTS.md` as links, phases, operational restart, backup evidence.
-- [ ] Detector gaps with sanitized local enhancement request, recommendation cards.
+- [x] Detector gaps with sanitized local enhancement request, recommendation cards (M2.8).
 - [x] Document project workflow and recent phases without turning into a task tracker (M2.3).
 
 - [x] Portable JSON catalogue backup/import, with review and manual path mapping (M2.4).
@@ -64,3 +64,15 @@ M2.7 implements R11 as four independent, dated manual evidence declarations with
 UNKNOWN defaults, Flyway V4 persistence, optimistic concurrency and JSON metadata transfer. It does not verify backups automatically. See
 `M2.7-VERIFICATION.md`. Recommendations/local sanitized drafts and final M2
 acceptance remain; M3 has not started.
+
+M2.8 adds deterministic suggestion cards (R14) and local allowlisted Markdown issue
+drafts for incomplete/unavailable detectors (R18). No remote submission or execution.
+See `M2.8-VERIFICATION.md`. Current JSON transfer is deliberately unversioned (ADR-017).
+Final M2 acceptance/documentation review remains; richer stack resolution remains
+explicitly unsupported. Do not start M3 before M2 validation.
+
+M2.9 adds port 8930 and the filterable/paginated catalogue with bounded, timestamped
+last-inspection summaries. PR #9 was merged into the old feature branch rather than
+main; this increment carries that reviewed history forward into main as well.
+See `M2.9-VERIFICATION.md` and `M2-ACCEPTANCE.md`. M3 remains unstarted pending final
+M2 acceptance, including browser usability review.

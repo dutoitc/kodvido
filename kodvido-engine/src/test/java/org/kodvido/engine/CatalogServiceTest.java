@@ -11,7 +11,7 @@ class CatalogServiceTest {
     @TempDir Path temp;
     MemoryCatalog catalog = new MemoryCatalog();
     MutableClock clock = new MutableClock();
-    CatalogService service = new CatalogService(new ProjectDirectoryScanner(), catalog, clock);
+    CatalogService service = new CatalogService(new ProjectDirectoryScanner(), catalog, clock,new ObservationCache());
     static class MemoryCatalog implements Catalog {
         Map<UUID,CatalogProject> data = new LinkedHashMap<>();
         public List<CatalogProject> list() { return List.copyOf(data.values()); }
