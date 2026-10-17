@@ -51,7 +51,7 @@ public final class GitInspector {
     }
 
     /** Preflight all metadata before Git can follow object/ref paths. Stable-tree assumption applies. */
-    private boolean safeMetadata(Path metadata) throws IOException {
+    boolean safeMetadata(Path metadata) throws IOException {
         boolean[] safe = {true}; int[] entries = {0}; long started = System.nanoTime();
         Files.walkFileTree(metadata, EnumSet.noneOf(FileVisitOption.class), 32, new SimpleFileVisitor<Path>() {
             private FileVisitResult check(Path path, BasicFileAttributes attrs) throws IOException {

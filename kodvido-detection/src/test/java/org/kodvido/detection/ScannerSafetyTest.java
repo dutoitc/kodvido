@@ -35,8 +35,8 @@ class ScannerSafetyTest {
         for (String excluded : List.of("target", "build", ".git", ".venv", "node_modules", "dist", "vendor")) marker(excluded + "/pom.xml", "<project/>");
         Path file = temp.resolve("python/requirements.txt"); var time = Files.getLastModifiedTime(file);
         var result = new ProjectDirectoryScanner().scan(List.of(temp));
-        assertThat(result.candidates()).hasSize(1);
-        assertThat(result.candidates().getFirst().evidence()).containsExactlyInAnyOrder("requirements.txt", "setup.py", "pyproject.toml");
+        assertThat(result.candidates()).hasSize(2);
+        assertThat(result.candidates().getLast().evidence()).containsExactlyInAnyOrder("requirements.txt", "setup.py", "pyproject.toml");
         assertThat(Files.readString(file)).isEqualTo("private-value"); assertThat(Files.getLastModifiedTime(file)).isEqualTo(time);
         assertThat(result.candidates().getFirst().observedAt()).isNotNull();
     }

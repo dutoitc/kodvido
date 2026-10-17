@@ -37,7 +37,7 @@ public final class BackupService {
             path = path.normalize();
             require(unique.add(path), "Chemins dupliqués.");
             var e=entries.get(i);
-            restored.add(new CatalogBackup.Entry(e.id(),e.name(),path.toString(),e.createdAt(),e.updatedAt(),e.notes(),e.assessment()));
+            restored.add(new CatalogBackup.Entry(e.id(),e.name(),path.toString(),e.createdAt(),e.updatedAt(),e.notes(),e.assessment(),e.inventoryNotes()));
         }
         store.restore(List.copyOf(restored));
         pending=null;
@@ -50,6 +50,11 @@ public final class BackupService {
             Objects.requireNonNull(e.id()); Objects.requireNonNull(e.createdAt()); Objects.requireNonNull(e.updatedAt());
             require(ids.add(e.id()), "Identifiants dupliqués.");
             text(e.name(),250); text(e.path(),4000);
+            if(e.inventoryNotes()!=null) {
+                var n=e.inventoryNotes();Objects.requireNonNull(n.lifecycle());
+                optionalText(n.note(),1000);optionalText(n.tasks(),10000);
+                require(n.revision()>=0 && n.revision()<Long.MAX_VALUE,"Révision invalide.");
+            }
             if(e.assessment()!=null) {
                 var a=e.assessment();
                 require(e.id().equals(a.projectId()),"Preuves liées à un autre projet.");

@@ -11,6 +11,11 @@ import javax.sql.DataSource;
 import java.time.Clock;
 @Configuration
 public class AppConfiguration {
+    @Bean org.kodvido.domain.Inventory.Store inventoryStore(DataSource source) {return new org.kodvido.persistence.JdbcInventoryStore(source);}
+    @Bean org.kodvido.engine.InventoryService inventoryService(DataSource source,org.kodvido.domain.Inventory.Store store) {
+        return new org.kodvido.engine.InventoryService(new JdbcCatalog(source),store,new org.kodvido.detection.InventoryInspector());
+    }
+
     @Bean org.kodvido.engine.ObservationCache observationCache() { return new org.kodvido.engine.ObservationCache(); }
     @Bean org.kodvido.engine.CatalogOverviewService catalogOverviewService(DataSource source,org.kodvido.engine.ObservationCache cache) {
         return new org.kodvido.engine.CatalogOverviewService(new JdbcCatalog(source),new org.kodvido.persistence.JdbcWorkflowStore(source),

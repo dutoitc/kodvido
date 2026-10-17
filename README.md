@@ -1,256 +1,107 @@
 # Kodvido
 
-A local Java 21 application for discovering and cataloguing software projects.
-The first M1 slice is implemented and verified by GitHub CI on Ubuntu and Windows;
-see [verification](docs/VERIFICATION.md). The first M2 slice adds a read-only project
-cockpit; M2 is still in progress and M3 has not started. Licensed under **GPL-3.0-only**; see [LICENSE](LICENSE) and [license decision](LICENSE-CHOICE.md).
+A local Java 21 / Spring Boot dashboard for your software projects. Start with a
+sortable inventory, then open a project for technologies, notes, tasks and docs.
+Windows and Linux; local H2 storage; GPL-3.0-only. M2 remains under validation and
+M3 offline HTML/PDF exports have not started.
 
 ## Build and run
 
-Install Java **21** and Maven **3.9+**, then run from the repository root:
+Install Java **21** and Maven **3.9+**:
 
 ```sh
 mvn -B --no-transfer-progress clean verify
 java -jar kodvido-app/target/kodvido-app-0.1.0-SNAPSHOT.jar
 ```
 
-Open **http://127.0.0.1:8930**. These commands are verified on Windows and Linux.
-The app is local-only and must not be exposed through a reverse proxy or to a LAN.
+Open **http://127.0.0.1:8930**. The executable JAR requires Java 21, not Maven.
+Bind only to loopback; do not expose the application to a LAN or reverse proxy.
+H2 lives outside the repository under `~/.kodvido/data`. Set `KODVIDO_DATA_DIR` to
+an absolute directory for separate work/home catalogues. Stop the app before
+copying its database files. There is no telemetry or automatic project mutation.
 
-The executable JAR in the delivery archive only requires Java 21, not Maven.
-The H2 database is created outside the repository, under `~/.kodvido/data`.
-Set `KODVIDO_DATA_DIR` to an **absolute directory** before starting to use a
-separate home/work catalogue. Stop the app before copying its database files.
-No telemetry, remote calls or discovered scripts are run. Explicit inspection
-can run one fixed, read-only command using the Git installed in the launch environment.
+## Use the inventory
 
-## Use
+Open http://127.0.0.1:8930 for the sortable inventory. Configure multiple absolute
+root paths under **Dossiers racines**, then review/confirm detected projects.
+One repository forms one row; module technologies appear together. Observations
+are persisted in local H2, refreshed at startup and every 30 minutes. Global and
+project rescan buttons queue work without blocking the page; reload the view when
+it finishes. Only one job runs at a time. Set `kodvido.inventory.automatic=false`
+to disable startup/periodic refresh; manual buttons remain available.
 
-1. Enter one absolute scan root per line, for example `~/projects` on Linux or
-   `D:\projects` on Windows. Up to 20 roots can be scanned together.
-2. Review candidates and diagnostics. Maven and Python are detected using
-   `pom.xml`, `pyproject.toml`, `requirements.txt`, and `setup.py`.
-3. Select projects and confirm import. Maven children declared in their parent's
-   POM are unchecked by default; select a child explicitly to manage it separately.
-4. Use **Relocaliser** after moving a project yourself. Validate the destination;
-   Kodvido changes only the catalogue mapping and preserves the project UUID.
-5. Open a project name, then **Observer les fichiers** to inspect file activity
-   and find project-owned documents. Open a document to read its live, escaped
-   UTF-8 text (256 KiB maximum); no content is copied into H2.
-6. Use **Retirer du catalogue** to remove an entry. Source files are never deleted.
+Click a project for technologies, remote checks, short note, text todo-list,
+lifecycle and read-only Markdown links. Short notes/tasks are part of private JSON
+catalogue backups; configured roots and observations are retained in H2 but omitted
+from portable JSON. Reconfigure roots after a JSON-only restore and rescan.
+Older phases/restart/backup worksheets remain secondary detail links.
 
-Scans never import automatically. Review expires after 30 minutes or a newer scan.
-Existing paths are not imported twice. Multi-project import is transactional.
-Root lists and detection previews are transient in M1; project identity/path/name
-and timestamps persist. Manual phases and restart notes also persist since M2.3;
-Git/file observations and their history remain transient.
+Remote Git checks contact configured HTTP(S)/SSH repositories using existing Git
+credentials without interactive prompts. No fetch/push, build, clean or source
+write occurs. Not-found/private, denied, timeout and unreachable remain separate.
+SSH hosts must already be trusted in the user's known_hosts; Kodvido adds no keys.
+URLs with embedded HTTP credentials/query strings and complex linked Git layouts
+are deliberately unsupported. Never put tokens in remote URL paths.
 
-## Safety and limitations
+The explicit dependency analysis button compares declared Maven coordinates and
+Angular/Bootstrap constraints with Maven Central/npm releases. Coordinates are sent
+to those registries; project files are not. This is not Maven effective-model,
+transitive dependency, Sonar, vulnerability or Java EOL analysis. Different release
+numbers require interpretation, especially version ranges/prereleases. Scans do
+not execute Maven or npm. See ADR-021 for bounds and the read-only rationale.
 
-- Scans skip generated/vendor directories, links and junctions. Maven XML rejects
-  DTDs and external entities; POM reads are capped at 1 MiB. No Maven execution.
-- Maximum depth 32, 100,000 visited entries and a 30-second cooperative budget.
-  Partial traversal, invalid roots and unreadable entries produce diagnostics.
-  Blocking filesystem calls cannot be forcibly interrupted; avoid network mounts.
-- Only already discovered descendant Maven modules are grouped. Conditional,
-  unresolved and external modules are flagged for manual review, never read by
-  following their declarations. Independent nested projects remain independent.
-- Native paths only: a Windows drive path is not translated on Linux.
-- Scanned trees should remain stable. Concurrent hostile filesystem replacement
-  is outside the M1 threat model; no-follow checks cannot remove all OS-level races.
-- CSRF, Host validation and HTML escaping protect local web forms.
-- There is no file editing, deployment, backup confidence calculation or report
-  generation. Unknown backup must never be interpreted as safe backup.
+## Limits and recovery
 
-## Architecture and tests
+Discovery supports at most 20 native roots, 32 levels / 100,000 entries / a
+30-second cooperative budget. Inventory uses 24 levels / 50,000 entries / 15
+seconds, 200 manifests of 256 KiB each, and up to 1000 declared Maven dependencies.
+Generated/vendor directories, symlinks and junctions are skipped; nested Git
+repositories are separate. No arbitrary script, Maven model extension or plugin
+is executed. Scanned trees should remain stable; blocking filesystem operations
+and hostile concurrent replacement remain OS-level limitations.
 
-`domain` (immutable data and catalogue port), `detection` (read-only filesystem),
-`engine` (use cases), `persistence` (JDBC/H2/Flyway), `reporting` (reserved, empty),
-`app` (Spring Boot composition and Thymeleaf). Spring remains in `app` only.
+Version queries are limited to 50 requests / 30 seconds plus the final in-flight
+request, with 5-second request and 256 KiB body limits. Git commands have a
+12-second process deadline and bounded output; up to 10 remotes are checked per
+project. Slow/unavailable repositories can delay a full inventory. The dashboard
+remains responsive and displays the previous dated observations during work.
 
-`mvn verify` executes JUnit unit and integration tests with temporary fixtures,
-including real H2/Flyway and a Spring web context. Reports are in each module's
-`target/site/jacoco/index.html`; Surefire XML is in `target/surefire-reports`.
-JaCoCo enforces engine/domain ≥90% branches, detection ≥85% lines and persistence
-≥80% lines. Reporting is empty; domain and engine branch gates apply to measured branches.
+Line counts are physical lines (including comments) in supported source extensions,
+not logical code statements. Files above 256 KiB are excluded. Missing declarations
+do not prove absence of a language. `.gitignore` is not interpreted by the inventory
+walker. Java support/EOL and semantic dependency upgrade decisions remain future work.
 
-See [requirements](docs/REQUIREMENTS.md), [decisions](docs/DECISIONS.md),
-[roadmap](docs/ROADMAP.md) and [verification](docs/VERIFICATION.md).
+Use **Relocaliser** after moving a project yourself; identity and notes survive,
+observations are invalidated. **Retirer du catalogue** deletes only catalogue
+metadata. Markdown links read the current file, bounded and HTML-escaped; missing
+files are optional. Notes/tasks are inert text and never execute commands.
 
-## M2.1 project cockpit
+Private JSON backup/import includes project identities, paths, lifecycle, notes,
+tasks and earlier phase/restart/backup declarations. It excludes source files,
+root configuration, observations and interaction history. Review imports and adapt
+paths before confirming. Existing IDs/paths cause an atomic rollback. Limits:
+8 MiB / 1000 projects, one current unversioned development format. Never publish
+these private JSON files. This is not a source/data backup or proof of restoration.
 
-File activity uses filesystem modification times, with inclusive UTC 7/30-day
-windows and a low-confidence warning. Future timestamps produce partial evidence
-and do not count as recent activity. An incomplete scan never proves inactivity.
-Observations are transient and explicitly requested via a CSRF-protected form;
-opening the project page alone does not recursively scan it.
+## Architecture and verification
 
-Exclusions and bounded traversal are shown in the UI. `.gitignore` is not parsed.
-The four supported documents are `PROJECT.md`, `TODO.md`, `AGENTS.md`, `README.md`;
-arbitrary document paths, binary/non-UTF-8 contents, symlinks and oversized files
-are not supported. Missing documents are optional, not project failures.
+`domain` (immutable types/ports), `detection` (read-only filesystem/network adapters),
+`engine` (Spring-free use cases), `persistence` (JDBC/H2/Flyway), `reporting` (reserved),
+`app` (Spring Boot composition, background worker and Thymeleaf).
 
-Interaction history and manual backup evidence are implemented in M2.6/M2.7;
-suggestions and local detector-gap drafts are implemented in M2.8. Portable JSON catalogue backup is implemented in M2.4.
-See [M2 verification](docs/M2-VERIFICATION.md).
+`mvn verify` runs JUnit unit and integration suites with synthetic temporary projects,
+H2/Flyway, real local Git and HTTP fixtures and the Spring web layer. JaCoCo reports
+are in each module's `target/site/jacoco`; test XML is in `target/surefire-reports`.
+Gates: engine/domain ≥90% branches, detection ≥85% lines, persistence ≥80% lines.
+The existing GitHub Actions matrix checks Java 21 on Ubuntu and Windows.
+
+See [current verification](docs/M2.10-VERIFICATION.md),
+[requirements](docs/REQUIREMENTS.md), [decisions](docs/DECISIONS.md),
+[roadmap](docs/ROADMAP.md) and earlier milestone verification records in `docs/`.
 
 ## License
 
-Copyright (C) 2026 Kodvido contributors. Kodvido is free software: you can
-redistribute it and/or modify it under the GNU General Public License as published
-by the Free Software Foundation, version 3 only. Kodvido is distributed without
-any warranty, including merchantability or fitness for a particular purpose.
-See [LICENSE](LICENSE) for the complete terms. Dependencies retain their own
-licenses. Commercial redistribution is permitted under GPLv3; no royalty or
-upstream contribution is required.
-
-## M2.2 local Git evidence
-
-The inspection form also reads the latest commit at the project's own `.git/HEAD`,
-including packed repositories and detached HEAD. It reports the commit hash and
-committer date, not authors, messages or remote URLs. The timestamp is Git-declared
-metadata, not independently verified activity; future timestamps are PARTIAL.
-This does not measure uncommitted changes, all branches or remote synchronisation.
-
-Git must be installed in the application's trusted launch environment. Kodvido
-uses one fixed read-only `git log` command without a shell, no pager/signature
-verification/notes, no global/system Git configuration, and no inherited `GIT_*`
-settings. No network operation or project script runs. Repository metadata is
-checked for links/junctions before Git starts. Includes, alternates, external
-worktrees/submodules, shallow/partial clones and extensions are conservatively
-UNSUPPORTED. It never searches parent directories for a repository.
-
-Metadata traversal is bounded at 32 levels / 100,000 entries / 5 seconds; the Git
-process has a separate 5-second timeout and 4 KiB output cap. The stable-tree
-assumption still applies. Missing `.git` is MISSING; unreadable/corrupt/unborn HEAD
-is FAILED (not evidence of no repository). Observations remain transient.
-
-## M2.3 phases and restart worksheets
-
-Open a project and choose **Modifier les phases et fiches de reprise**. Record up
-to five important phases (date, description, planned/in-progress/done), plus separate
-**development** (build/test) and **operations** (run/diagnose/deploy) instructions.
-Descriptions are limited to 500 characters and each restart note to 4,000. Clear a
-phase's date and description to remove that row on save. Notes are inert text;
-Kodvido does not execute any entered command.
-
-These are user-declared catalogue notes, with a save timestamp and revision,
-separate from measured Git/file evidence and the project's own PROJECT.md. No
-project file is read into these notes or changed by saving. Do not enter secrets.
-Relocation preserves the worksheet; catalogue removal cascades only its metadata.
-
-Flyway V2 migrates existing V1 catalogues without replacing their projects. A save
-is transactional. A stale browser tab receives HTTP 409 and its unsaved text is
-shown for recovery; reload the current worksheet before submitting a new revision.
-There is no phase archive or full task tracker. See [M2.3 verification](docs/M2.3-VERIFICATION.md).
-
-### M2.4 — Local JSON catalogue backup
-
-Open **Sauvegarder ou restaurer le catalogue JSON** from the home page. Download a
-JSON snapshot containing catalogue IDs, names, paths, timestamps, phases
-development/operations notes and manual backup declarations. Treat this file as private: it contains local
-paths and manually entered text, is not encrypted, and must not be committed or
-shared publicly. Project files/documents and transient observations are excluded.
-
-To restore, upload the JSON, review the entries/notes, adapt absolute destination
-paths for Windows or Linux, then confirm. Missing directories are allowed; no
-filesystem access is performed. Identifiers, timestamps and note revisions are
-preserved. Any existing ID or identical stored path aborts the entire batch,
-without overwriting existing data. Restoring into an empty catalogue is the
-simplest complete recovery. A successful restore consumes the preview; previews
-expire after 30 minutes or when replaced. Limits: 8 MiB JSON, 1000 projects.
-Larger snapshots fail explicitly rather than silently dropping entries.
-
-This backs up catalogue metadata only, not project source, untracked files or
-application databases. It does not mark a project's backup as verified. M3 offline
-HTML/PDF reports remain unimplemented.
-
-### M2.5 — Stack declarations and potential scripts
-
-Use **Observer les fichiers** on a project page to see Java declarations from root
-Maven properties/compiler plugin, Python's simple `[project].requires-python` and
-`.python-version`, with source and observation time. Expressions and conflicting
-values are displayed as written, not resolved. These are partial declarations,
-not the installed or effective runtime. Parent POMs, profiles, child module POMs,
-pluginManagement, Poetry and dynamic Python configuration are not evaluated.
-
-Potential script names (`.sh`, `.bat`, `.cmd`, `.ps1`, `.py`, `mvnw`) are listed only
-at root and directly inside `scripts/`. Their content, executable permission and
-safety are not inspected. No script or language/build runtime is invoked. Bounds:
-256 KiB per manifest, XML depth 64, 200 directory entries and cooperative 5-second
-script enumeration. Links and special files are excluded. Empty evidence means
-UNKNOWN, not absence of a technology. Findings remain transient, outside backups.
-
-### M2.6 — Local interactions
-
-The project page now shows the last recorded Kodvido interaction and up to 100
-recent events: inspection requests, saved workflow notes and relocations. This
-history persists across restarts and relocation. Notes/path changes and their
-success events commit atomically; stale or failed mutations create no event.
-An inspection event records the request, including when inspection later finds
-missing files; it does not claim a successful inspection or developer activity.
-
-Read-only page/document views, scans before import and metadata imports/restores
-are not tracked. Older activity is not fabricated: an empty history is UNKNOWN.
-Ordering follows insertion sequence, so a corrected system clock does not reorder
-previous events. Retention/removal affects only catalogue metadata. No paths,
-commands, source content or identities are copied into these events.
-
-This bounded operational history is excluded from JSON backups; restoring
-metadata preserves notes but starts a fresh interaction history. It is not an audit
-log or evidence of project/data backup. Manual backup declarations are available in M2.7; automated verification remains unsupported.
-
-### M2.7 — Dated backup evidence
-
-Choose **Renseigner les preuves** on a project page. Record four separate states:
-remote Git sync, copies of untracked/ignored files, application data backup, and
-restore test. UNKNOWN is the default. DECLARED_OK / DECLARED_FAILED require a check
-date (not in the future, UTC) and evidence/problem description, up to 1000 characters.
-For UNKNOWN, leave the date empty. Never enter credentials or secrets.
-
-All results are human declarations, not independently verified by Kodvido. A Git
-remote is not a backup of all files/data; a copy is not proof of restoration. Old
-dates remain displayed without automatic renewal. No global safe score is shown.
-Nothing executes, contacts a remote, or modifies a project when this form is saved.
-Stale tabs receive HTTP 409 with escaped text for recovery. Relocation keeps the
-worksheet; removal deletes only catalogue metadata. Saves do not add a history event.
-
-The current JSON format includes these declarations. During development there is
-no format version or backward-compatibility contract; earlier exports must be recreated. Restoring metadata preserves the
-original check dates/revisions, and never verifies or restores project data.
-See [M2.7 verification](docs/M2.7-VERIFICATION.md).
-
-### M2.8 — Suggestions and local detector-gap drafts
-
-The project page suggests completing empty restart worksheets, checking UNKNOWN or
-failed backup declarations, and reviewing detector limitations. Before inspection,
-the detector suggestions are NOT_OBSERVED. Opening the page performs no new scan;
-only **Observer les fichiers** refreshes the transient observations used here.
-There is no global score or automatic script/update/repair. No suggestion does not
-mean the project or its backups are verified safe.
-
-After inspection, PARTIAL/UNKNOWN/UNSUPPORTED/FAILED results show a local Markdown
-issue draft. MISSING does not automatically suggest a detector enhancement. Choose
-**Télécharger ce brouillon Markdown** to save it locally. The text includes only
-allowlisted detector/status values and fixed guidance for a synthetic reproduction;
-project names, paths, raw diagnostics, source text and manual notes are excluded.
-No issue is submitted, no remote is contacted and download does not re-inspect.
-Review any additions before manually sharing a draft. These transient drafts are
-excluded from catalogue backups. See [M2.8 verification](docs/M2.8-VERIFICATION.md).
-
-### M2.9 — Filterable catalogue table
-
-The default URL is **http://127.0.0.1:8930** (`--server.port=...` still overrides it).
-The catalogue shows project/path, observed Java/Python declarations and script count,
-file activity, local HEAD date, restart completeness, backup unknown/failure counts
-and last recorded interaction. Open **Observer** to refresh one project's evidence.
-
-Search names, paths or displayed versions; combine technology and observation/backup
-filters, sort by name or recent inspection/interaction, and navigate 25 rows/page.
-No scan occurs on page load, filtering or pagination. No Java/Python evidence means
-UNKNOWN, not absence of a language. Inspection results remain dated and partial.
-
-The last 1000 inspection summaries stay in memory until restart, and disappear on
-relocation/removal. Display is capped at four declarations, 160 characters per field;
-inspect the project for fuller evidence. JSON backups exclude these temporary
-summaries. Workflow and backup declarations remain persisted independently.
+Copyright (C) 2026 Kodvido contributors. Licensed under **GPL-3.0-only**, without
+warranty. Commercial redistribution is permitted under GPLv3; no royalty or
+upstream contribution is required. Dependencies retain their own licenses.
+See [LICENSE](LICENSE) and [license decision](LICENSE-CHOICE.md).

@@ -27,27 +27,27 @@ class CatalogTableIntegrationTest {
     CatalogOverviewService.Page page(org.springframework.test.web.servlet.MvcResult r){return (CatalogOverviewService.Page)r.getModelAndView().getModel().get("catalog");}
     @Test void observationsAppearInFilteredTableWithoutRescansAndRelocationClearsThem()throws Exception{
         assertThat(environment.getProperty("server.port")).isEqualTo("8930");
-        var initial=mvc.perform(get("/")).andExpect(status().isOk()).andExpect(content().string(containsString("catalog-table"))).andReturn();
+        var initial=mvc.perform(get("/catalog")).andExpect(status().isOk()).andExpect(content().string(containsString("catalog-table"))).andReturn();
         assertThat(page(initial).rows().getFirst().observation()).isNull();assertThat(details.interactions(id)).isEmpty();
         mvc.perform(post("/projects/"+id+"/inspect").with(csrf())).andExpect(status().isOk());var history=details.interactions(id);
         Files.delete(temp.resolve("pom.xml"));
-        var filtered=mvc.perform(get("/").param("q","21").param("technology","JAVA").param("filter","OBSERVED").param("sort","OBSERVED"))
+        var filtered=mvc.perform(get("/catalog").param("q","21").param("technology","JAVA").param("filter","OBSERVED").param("sort","OBSERVED"))
             .andExpect(status().isOk()).andExpect(content().string(containsString("&lt;script&gt;21&lt;/script&gt;"))).andReturn();
         assertThat(page(filtered).filtered()).isEqualTo(1);assertThat(details.interactions(id)).isEqualTo(history);
         assertThat(Files.exists(temp.resolve("pom.xml"))).isFalse();
         Path moved=Files.createDirectory(temp.resolve("moved"));
         mvc.perform(post("/projects/"+id+"/relocate").with(csrf()).param("path",moved.toString())).andExpect(status().is3xxRedirection());
-        var after=mvc.perform(get("/").param("filter","UNOBSERVED")).andExpect(status().isOk()).andReturn();
+        var after=mvc.perform(get("/catalog").param("filter","UNOBSERVED")).andExpect(status().isOk()).andReturn();
         assertThat(page(after).filtered()).isEqualTo(1);assertThat(page(after).rows().getFirst().observation()).isNull();
         mvc.perform(post("/projects/"+id+"/inspect").with(csrf())).andExpect(status().isOk());var project=catalog.list().getFirst();assertThat(cache.find(project)).isPresent();
         mvc.perform(post("/projects/"+id+"/remove").with(csrf())).andExpect(status().is3xxRedirection());assertThat(cache.find(project)).isEmpty();assertThat(Files.isDirectory(moved)).isTrue();
     }
     @Test void emptyResultsEscapedFiltersAndInvalidRequestsAreHandled()throws Exception{
-        mvc.perform(get("/").param("q","<script>absent</script>")).andExpect(status().isOk()).andExpect(content().string(containsString("&lt;script&gt;absent&lt;/script&gt;")))
+        mvc.perform(get("/catalog").param("q","<script>absent</script>")).andExpect(status().isOk()).andExpect(content().string(containsString("&lt;script&gt;absent&lt;/script&gt;")))
             .andExpect(content().string(containsString("Aucun projet ne correspond")));
-        mvc.perform(get("/").param("page","-1")).andExpect(status().isBadRequest());mvc.perform(get("/").param("q","x".repeat(201))).andExpect(status().isBadRequest());
-        mvc.perform(get("/").param("sort","invalid")).andExpect(status().isBadRequest());
-        mvc.perform(get("/").param("page","999")).andExpect(status().isOk());
+        mvc.perform(get("/catalog").param("page","-1")).andExpect(status().isBadRequest());mvc.perform(get("/catalog").param("q","x".repeat(201))).andExpect(status().isBadRequest());
+        mvc.perform(get("/catalog").param("sort","invalid")).andExpect(status().isBadRequest());
+        mvc.perform(get("/catalog").param("page","999")).andExpect(status().isOk());
         assertThat(details.interactions(id)).isEmpty();
     }
 }

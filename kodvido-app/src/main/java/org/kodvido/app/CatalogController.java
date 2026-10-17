@@ -13,13 +13,14 @@ import java.util.*;
 @Controller
 public class CatalogController {
     private final CatalogService service;
+    private final InventoryJobs jobs;
     private final ProjectDetailsService details;
     private final org.kodvido.engine.WorkflowService workflow;
     private final org.kodvido.engine.BackupAssessmentService assessments;
     private final org.kodvido.engine.GuidanceService guidance;
     private final CatalogOverviewService overview;
-    public CatalogController(CatalogService service, ProjectDetailsService details, org.kodvido.engine.WorkflowService workflow, org.kodvido.engine.BackupAssessmentService assessments, org.kodvido.engine.GuidanceService guidance,CatalogOverviewService overview) {
-        this.service = service; this.details = details; this.workflow = workflow; this.assessments=assessments;this.guidance=guidance;this.overview=overview;
+    public CatalogController(CatalogService service, ProjectDetailsService details, org.kodvido.engine.WorkflowService workflow, org.kodvido.engine.BackupAssessmentService assessments, org.kodvido.engine.GuidanceService guidance,CatalogOverviewService overview,InventoryJobs jobs) {
+        this.jobs=jobs;this.service = service; this.details = details; this.workflow = workflow; this.assessments=assessments;this.guidance=guidance;this.overview=overview;
     }
     @GetMapping("/projects/{id}") public String project(@PathVariable("id") UUID id, Model model) {
         model.addAttribute("project", details.project(id)); model.addAttribute("workflow", workflow.load(id));
@@ -52,7 +53,7 @@ public class CatalogController {
         model.addAttribute("project", details.project(id));
         model.addAttribute("document", details.document(id, name)); return "document";
     }
-    @GetMapping("/") public String home(Model model,@RequestParam(value="q",defaultValue="") String q,
+    @GetMapping("/catalog") public String home(Model model,@RequestParam(value="q",defaultValue="") String q,
             @RequestParam(value="technology",defaultValue="ALL") CatalogOverviewService.Technology technology,
             @RequestParam(value="filter",defaultValue="ALL") CatalogOverviewService.Filter filter,
             @RequestParam(value="sort",defaultValue="NAME") CatalogOverviewService.Sort sort,
@@ -67,7 +68,7 @@ public class CatalogController {
     }
     @PostMapping("/import") public String confirm(@RequestParam("previewId") UUID id,
             @RequestParam(value="selected", required=false) List<Integer> selected) throws IOException {
-        service.confirm(id, selected == null ? List.of() : selected); return "redirect:/";
+        service.confirm(id, selected == null ? List.of() : selected); jobs.imported();return "redirect:/";
     }
     @PostMapping("/projects/{id}/relocate") public String relocate(@PathVariable("id") UUID id, @RequestParam("path") String path) throws IOException {
         service.relocate(id, path); return "redirect:/";

@@ -37,7 +37,7 @@ public final class CatalogService {
             var candidate = pending.report().candidates().get(index);
             Path path = SafePaths.directory(candidate.root());
             if (existing.contains(path)) continue;
-            boolean markerPresent = candidate.evidence().stream().anyMatch(e -> Files.isRegularFile(path.resolve(e), LinkOption.NOFOLLOW_LINKS));
+            boolean markerPresent = candidate.evidence().stream().anyMatch(e -> (Files.isRegularFile(path.resolve(e), LinkOption.NOFOLLOW_LINKS) || (e.equals(".git") && Files.isDirectory(path.resolve(e),LinkOption.NOFOLLOW_LINKS))));
             if (!markerPresent) throw new IllegalArgumentException("Projet changé depuis le scan ; relancez-le.");
             Instant now = clock.instant();
             String name = Optional.ofNullable(path.getFileName()).map(Path::toString).orElse("Project");

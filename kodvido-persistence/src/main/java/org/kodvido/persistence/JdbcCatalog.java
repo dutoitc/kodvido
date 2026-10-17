@@ -41,6 +41,7 @@ public final class JdbcCatalog implements Catalog {
                 statement.setString(1, project.path().toString()); statement.setObject(2, project.updatedAt().atOffset(ZoneOffset.UTC));
                 statement.setObject(3, project.id());
                 if (statement.executeUpdate() != 1) throw new CatalogException();
+                try(var invalidate=connection.prepareStatement("DELETE FROM inventory_snapshot WHERE project_id=?")) { invalidate.setObject(1,project.id());invalidate.executeUpdate(); }
                 JdbcInteractionStore.append(connection,project.id(),Interaction.Kind.RELOCATED,project.updatedAt());
                 connection.commit();
             } catch (SQLException | RuntimeException ex) { connection.rollback(); throw ex; }

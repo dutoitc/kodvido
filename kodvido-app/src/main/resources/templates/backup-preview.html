@@ -6,6 +6,7 @@
 <form th:action="@{/backup/confirm}" method="post"><input type="hidden" name="token" th:value="${preview.id}">
 <article th:each="p : ${preview.backup.projects}"><h2 th:text="${p.name}"></h2><small th:text="${p.id}"></small>
 <label>Chemin local<input name="path" th:value="${p.path}" maxlength="4000" required></label>
+<details th:if="${p.inventoryNotes != null}"><summary>Statut, note et tâches à restaurer</summary><p th:text="${p.inventoryNotes.lifecycle}"></p><pre th:text="${p.inventoryNotes.note}"></pre><pre th:text="${p.inventoryNotes.tasks}"></pre></details>
 <details th:if="${p.notes != null}"><summary>Notes à restaurer</summary><p>Révision <span th:text="${p.notes.revision}"></span> · <span th:text="${p.notes.updatedAt}"></span></p>
 <ul><li th:each="phase : ${p.notes.phases}"><span th:text="${phase.date}"></span> · <span th:text="${phase.description}"></span> · <span th:text="${phase.state}"></span></li></ul>
 <h3>Développement</h3><pre th:text="${p.notes.development}"></pre><h3>Exploitation</h3><pre th:text="${p.notes.operations}"></pre></details><details th:if="${p.assessment != null}"><summary>Déclarations de sauvegarde à restaurer (non vérifiées)</summary><ul><li th:each="i : ${p.assessment.items}"><span th:text="${i.dimension}"></span> · <span th:text="${i.state}"></span> · <span th:text="${i.checkedOn ?: 'UNKNOWN'}"></span><pre th:text="${i.evidence}"></pre></li></ul></details></article>

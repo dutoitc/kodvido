@@ -19,7 +19,7 @@ public final class JdbcBackupStore implements BackupStore {
                     UUID id=rows.getObject("id",UUID.class);
                     result.add(new CatalogBackup.Entry(id,rows.getString("name"),rows.getString("primary_path"),
                         rows.getObject("created_at",OffsetDateTime.class).toInstant(),rows.getObject("updated_at",OffsetDateTime.class).toInstant(),
-                        JdbcWorkflowStore.find(c,id).orElse(null),JdbcBackupAssessmentStore.find(c,id).orElse(null)));
+                        JdbcWorkflowStore.find(c,id).orElse(null),JdbcBackupAssessmentStore.find(c,id).orElse(null),inventoryNotes(c,id)));
                 }
                 c.commit(); return List.copyOf(result);
             } catch(SQLException | RuntimeException ex) { c.rollback(); throw ex; }
@@ -34,6 +34,12 @@ public final class JdbcBackupStore implements BackupStore {
                         s.setObject(1,e.id());s.setString(2,e.name());s.setString(3,e.path());
                         s.setObject(4,e.createdAt().atOffset(ZoneOffset.UTC));s.setObject(5,e.updatedAt().atOffset(ZoneOffset.UTC));s.executeUpdate();
                     }
+                    if(e.inventoryNotes()!=null) {
+                        var n=e.inventoryNotes();
+                        try(var s=c.prepareStatement("INSERT INTO inventory_note VALUES(?,?,?,?,?)")) {
+                            s.setObject(1,e.id());s.setString(2,n.lifecycle().name());s.setString(3,n.note());s.setString(4,n.tasks());s.setLong(5,n.revision());s.executeUpdate();
+                        }
+                    }
                     if(e.notes()!=null) insertNotes(c,e.notes());
                     if(e.assessment()!=null) JdbcBackupAssessmentStore.insert(c,e.assessment());
                 }
@@ -41,6 +47,7 @@ public final class JdbcBackupStore implements BackupStore {
             } catch(SQLException | RuntimeException ex) { c.rollback(); throw ex; }
         } catch(SQLException ex) { throw new CatalogException(ex.getSQLState(),ex.getErrorCode()); }
     }
+    private static Inventory.Notes inventoryNotes(Connection c,UUID id) {var n=JdbcInventoryStore.notes(c,id);return n.revision()==0?null:n;}
     private static void insertNotes(Connection c,WorkflowNotes n) throws SQLException {
         try(var s=c.prepareStatement("INSERT INTO workflow_notes(project_id,revision,development,operations,updated_at) VALUES(?,?,?,?,?)")) {
             s.setObject(1,n.projectId());s.setLong(2,n.revision());s.setString(3,n.development());s.setString(4,n.operations());
