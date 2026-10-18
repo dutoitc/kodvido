@@ -76,3 +76,17 @@ last-inspection summaries. PR #9 was merged into the old feature branch rather t
 main; this increment carries that reviewed history forward into main as well.
 See `M2.9-VERIFICATION.md` and `M2-ACCEPTANCE.md`. M3 remains unstarted pending final
 M2 acceptance, including browser usability review.
+
+## M2.10 — Inventory-first correction (owner clarification, 2026-10-17)
+
+- [x] Default compact dashboard, column sorts/filters, optional detail view.
+- [x] H2 persisted roots/observations/lifecycle/notes/tasks; asynchronous startup,
+  periodic and manual refresh. Newly discovered projects require confirmation.
+- [x] Repository-level grouping, non-Git projects, bounded module/Node declarations.
+- [x] Automatic read-only remote Git checks and local working-tree evidence.
+- [x] Explicit public-registry comparison of declared Maven/Angular/Bootstrap versions.
+- [ ] Owner validates the revised dashboard with a real project portfolio.
+- [ ] Richer effective Maven resolution/support lifecycle policy (not claimed here).
+
+M3 remains paused until this revised product target is validated. See ADR-020/021
+and M2.10-VERIFICATION.md for executed checks and actual limitations.

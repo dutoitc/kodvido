@@ -263,3 +263,58 @@ Text search covers names, paths and displayed declaration evidence. Filters comb
 with AND; sort uses newest non-null observation/interaction first or name A–Z, with
 stable name/UUID tie-breaks. Empty results and invalid queries have explicit states.
 No global backup-safe score: four dimensions remain independent on the project page.
+
+## ADR-020 Inventory-first dashboard — supersedes transient cockpit defaults
+
+On 2026-10-17 the owner clarified that the landing page must be a dense inventory,
+not a set of worksheets. Persist scan roots, last observations and short user notes
+in H2 (Flyway V5). One Git repository is one project by default, including mixed
+Java/Angular stacks; repositories nested in other repositories remain independent.
+Without Git, existing Maven/Python grouping and Node manifests remain supported.
+New discoveries still require onboarding confirmation. Auto-refresh existing
+catalogue entries at startup and every 30 minutes, plus explicit asynchronous
+rescan controls. GET/filter/sort operations only read stored data. A single worker
+rejects overlapping requests. Relocation invalidates evidence; late results for a
+previous location are discarded transactionally. Removing an entry never removes
+its source files. Manual notes/tasks/lifecycle use optimistic revisions and are
+included in the current unversioned JSON backup. Roots and rebuildable observations
+stay in the local database, outside that portable metadata backup.
+
+This explicitly supersedes ADR-010/014/019 transient-only inspection for the new
+inventory. Existing detailed diagnostic/worksheet routes remain available through
+secondary navigation. No M3 implementation is included.
+
+## ADR-021 Authorized read-only Git network checks and version comparison
+
+The owner authorizes automatic repository reachability checks using existing local
+credentials, without interactive login. Use installed Git `ls-remote` (no fetch,
+push, clean, checkout, index refresh or working-tree writes). Allow only HTTP(S),
+SSH/scp remote addresses, reject credentials in HTTP URLs and URL query/fragment
+strings, and never store raw error output. Distinguish accessible (including empty
+repositories), not-found-or-private, denied, timeout, unreachable, other failure,
+no remote and unsupported. These are dated observations, never proof of a backup
+or synchronization. Git protocol errors do not necessarily expose an HTTP status;
+a 404 does not prove deletion. Repositories using unsupported indirect/complex
+metadata fail closed. Remote processes run outside project directories with
+noninteractive SSH/credential settings, bounded output and a process deadline.
+User-global Git configuration/credential helpers are trusted for network access;
+project-local configuration is not executed by the remote command.
+
+Bounded local manifest traversal gathers declarations from modules/subdirectories,
+excluding generated/vendor paths, links and independent nested Git repositories.
+The UI stacks multiple versions in the same cell. Physical line counts include
+comments and only supported source extensions; large files are excluded. They are
+partial inventory metrics, not code-quality measurements.
+
+Explicit dependency comparison reads Maven dependency declarations and Angular/
+Bootstrap package.json constraints, then queries public Maven Central/npm metadata.
+Only dependency coordinates leave the machine, with an explanation beside the
+button. Source paths, source content, notes and project configuration are not sent.
+Bound requests, body sizes and total query count/time. No Maven executable, wrapper,
+plugin, build or clean is run: copying an original POM and executing its model would
+still permit extensions/plugins and absolute-path writes. This first implementation
+therefore does not claim an effective dependency tree, inherited/profile/property
+resolution, transitive dependencies, vulnerability scanning or Java support/EOL.
+A differing registry release is labelled a comparison to examine, not automatically
+an upgrade or technical debt. Preserve dated comparisons across ordinary rescans
+only while coordinate/version/source match. Sonar is explicitly out of scope.

@@ -1,0 +1,13 @@
+CREATE TABLE inventory_root (position INTEGER PRIMARY KEY, path VARCHAR(4096) NOT NULL);
+CREATE TABLE inventory_snapshot (
+ project_id UUID PRIMARY KEY REFERENCES project(id) ON DELETE CASCADE,
+ location VARCHAR(4096) NOT NULL,
+ payload CLOB NOT NULL
+);
+CREATE TABLE inventory_note (
+ project_id UUID PRIMARY KEY REFERENCES project(id) ON DELETE CASCADE,
+ lifecycle VARCHAR(20) NOT NULL,
+ note VARCHAR(1000) NOT NULL,
+ tasks VARCHAR(10000) NOT NULL,
+ revision BIGINT NOT NULL
+);

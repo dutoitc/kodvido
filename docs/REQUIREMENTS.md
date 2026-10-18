@@ -32,3 +32,20 @@ Definitions: **M1** minimum end-to-end intake, **M2** core cockpit, **M3** repor
 - Filesystem mtime is an imperfect proxy for activity; avoid treating bulk-generated changes as active development.
 - Manage home/work data in separate installations/profiles. Never publish private path/credentials in sample config or GitHub issues.
 - Onboarding is by folder roots; scanner **cannot** read arbitrary files outside user-selected roots during normal discovery.
+
+## Inventory-first clarification — 2026-10-17
+
+- R21: landing dashboard is a compact sortable/filterable table, one row per Git
+  repository (or detected non-Git project), then optional detail at a click.
+- R22: multiple configured roots and persisted latest inventory; background refresh
+  on startup/30-minute schedule plus global/project rescan, without source writes.
+- R23: separate declared lifecycle (active/paused/completed/archived), local Git
+  state/activity and dated remote accessibility. Unknown is not failed or deleted.
+- R24: show module Java declarations and Angular/Bootstrap constraints, multiline
+  for multiple versions. Physical source line counts are explicitly partial.
+- R25: short dashboard note and a simple text todo-list in Kodvido; Markdown files
+  remain live read-only links. No source project is modified by notes or scans.
+- R26: dependency declaration comparison on demand, no Sonar and no Maven build or
+  clean. Version difference is not a support/security verdict. No automatic repairs.
+
+Implementation boundaries and conflicts with earlier defaults: ADR-020/021.

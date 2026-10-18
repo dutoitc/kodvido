@@ -14,7 +14,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /** Bounded, read-only discovery. Neither scripts nor Maven models are executed. */
 public final class ProjectDirectoryScanner {
     private static final Set<String> IGNORED = Set.of(".git", "target", "build", ".venv", "venv", "node_modules", "dist", ".idea", "__pycache__", "vendor");
-    private static final Set<String> INDICATORS = Set.of("pom.xml", "pyproject.toml", "requirements.txt", "setup.py");
+    private static final Set<String> INDICATORS = Set.of("pom.xml", "pyproject.toml", "requirements.txt", "setup.py", "package.json");
     private final int maxDepth, maxEntries;
     private final Duration timeout;
     public ProjectDirectoryScanner() { this(32, 100_000, Duration.ofSeconds(30)); }
@@ -46,6 +46,8 @@ public final class ProjectDirectoryScanner {
                         if (!dir.equals(root) && IGNORED.contains(dir.getFileName().toString().toLowerCase(Locale.ROOT))) return FileVisitResult.SKIP_SUBTREE;
                         try { SafePaths.directory(dir); }
                         catch (IOException ex) { diagnostics.add(label + " : lien ou dossier inaccessible ignoré."); return FileVisitResult.SKIP_SUBTREE; }
+                        if (Files.isDirectory(dir.resolve(".git"),LinkOption.NOFOLLOW_LINKS))
+                            found.computeIfAbsent(dir, ignored -> new TreeSet<>()).add(".git");
                         return FileVisitResult.CONTINUE;
                     }
                     @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
@@ -108,6 +110,15 @@ public final class ProjectDirectoryScanner {
                     }
                 }
             } catch (Exception ex) { notes.computeIfAbsent(dir, k -> new ArrayList<>()).add("POM illisible, trop volumineux ou XML non pris en charge."); }
+        }
+        // A Git repository is the dashboard unit; preserve nested repositories as separate projects.
+        for (var entry : found.entrySet()) {
+            if (entry.getValue().contains(".git")) { parents.remove(entry.getKey());continue; }
+            Path ancestor=entry.getKey().getParent();
+            while(ancestor!=null) {
+                if(found.containsKey(ancestor) && found.get(ancestor).contains(".git")) {parents.put(entry.getKey(),ancestor);break;}
+                ancestor=ancestor.getParent();
+            }
         }
         Instant observedAt = Instant.now();
         var candidates = found.entrySet().stream().map(e -> new DetectedProject(e.getKey(), e.getValue(), parents.get(e.getKey()),

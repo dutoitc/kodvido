@@ -1,3 +1,9 @@
+> The M2.9 visual review led to an owner-requested product correction on
+> 2026-10-17. M2.10 now provides the default persisted inventory dashboard;
+> the historical checks below remain applicable to secondary worksheets only.
+> See M2.10-VERIFICATION.md and ADR-020/021. Owner validation of the new dashboard
+> is required before resuming M3.
+
 # M2 acceptance — functional evidence and remaining visual review
 
 The implemented M2 scope is covered by the following checks. This is not a claim of
